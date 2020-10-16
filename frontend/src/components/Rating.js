@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function Rating({ value, text, color }) {
   const maxStars = 5;
@@ -27,7 +28,7 @@ function Rating({ value, text, color }) {
             <i style={{ color }} className={uiStarClass}></i>
           </span>
         );
-      })}
+      })}{' '}
       <span>{text && text}</span>
     </div>
   );
@@ -35,6 +36,12 @@ function Rating({ value, text, color }) {
 
 Rating.defaultProps = {
   color: '#f8e825',
+};
+
+Rating.propTypes = {
+  value: PropTypes.number.isRequired,
+  text: PropTypes.string.isRequired,
+  color: PropTypes.string,
 };
 
 export default Rating;
