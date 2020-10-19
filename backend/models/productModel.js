@@ -12,7 +12,6 @@ const reviewSchema = mongoose.Schema(
 );
 
 const productSchema = mongoose.Schema({
-  //Adds a relationship between product and user, showing which user (admin) created the product.
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
