@@ -4,7 +4,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 function Header() {
   //to be changed when admin panel is added
-  const items = 2;
 
   return (
     <header>
