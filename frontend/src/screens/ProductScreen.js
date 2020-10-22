@@ -1,18 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap';
+import {
+  Form,
+  Row,
+  Col,
+  Image,
+  ListGroup,
+  Card,
+  Button,
+} from 'react-bootstrap';
 import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../actions/ProductActions';
 
-function ProductScreen({ match }) {
+function ProductScreen({ history, match }) {
+  const [qty, setQty] = useState(1);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getProduct(match.params.id));
   }, [dispatch, match.params.id]);
+
+  const addToCartHandler = () => {
+    history.push(`/cart/${match.params.id}?qty=${qty}`);
+  };
 
   const { product, loading, error } = useSelector(
     (state) => state.productDetails
@@ -49,7 +63,7 @@ function ProductScreen({ match }) {
           </Col>
           <Col lg={3}>
             <Card>
-              <ListGroup variant="flish">
+              <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
                     <Col>Price:</Col>
@@ -68,11 +82,38 @@ function ProductScreen({ match }) {
                   </Row>
                 </ListGroup.Item>
 
+                {product.countInStock > 0 && (
+                  <ListGroup.Item>
+                    <Row>
+                      <Col>Qty</Col>
+                      <Col>
+                        <Form.Control
+                          as="select"
+                          value={qty}
+                          onChange={(e) => {
+                            setQty(e.target.value);
+                          }}
+                        >
+                          {/*
+                          Array(number) creates an [empty * number], spreading it creates an array of undefined items, as many as the number is. Example:[...Array(5)] gives an array of 5 undefineds. Using .key() returns their indeces, so we end up with an array of [0,1,2,3,4]
+                           */}
+                          {[...Array(product.countInStock).keys()].map((x) => (
+                            <option key={x + 1} value={x + 1}>
+                              {x + 1}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                )}
+
                 <ListGroup.Item>
                   <Button
                     className="btn-block"
                     type="button"
                     disabled={product.countInStock <= 0}
+                    onClick={addToCartHandler}
                   >
                     Add To Cart
                   </Button>
