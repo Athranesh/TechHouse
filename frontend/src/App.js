@@ -18,6 +18,7 @@ function App() {
           <Route path="/product/:id" component={ProductScreen} />
           {/* ? for optional */}
           <Route path="/cart/:id?" component={CartScreen} />
+          {/* <Route path="/cart/:id?/:qty?" component={CartScreen} /> */}
         </Container>
       </main>
       <Footer />
