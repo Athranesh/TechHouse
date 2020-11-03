@@ -3,22 +3,26 @@ import {
   USER_LOGIN_SUCCESS,
   USER_LOGIN_FAIL,
   USER_LOGOUT,
+  CLEAR_ERROR,
 } from '../types/userTypes';
 
 export const userLoginReducer = (
-  state = { loading: false, userLogin: null, error: null },
+  state = { loading: false, userInfo: null, error: null },
   action
 ) => {
   switch (action.type) {
     case USER_LOGIN_REQUEST:
-      return { loading: true, userLogin: null, error: null };
+      return { loading: true, userInfo: null, error: null };
 
     case USER_LOGIN_SUCCESS:
-      return { loading: false, userLogin: action.payLoad, error: null };
+      return { loading: false, userInfo: action.payload, error: null };
     case USER_LOGIN_FAIL:
-      return { loading: false, userLogin: null, error: action.payLoad };
+      return { loading: false, userInfo: null, error: action.payload };
     case USER_LOGOUT:
-      return { loading: false, userLogin: null, error: null };
+      return { loading: false, userInfo: null, error: null };
+
+    case CLEAR_ERROR:
+      return { ...state, error: null };
 
     default:
       return state;
