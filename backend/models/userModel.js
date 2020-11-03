@@ -32,6 +32,17 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+//Middleware that runs before the object is saved
+userSchema.pre('save', async function (next) {
+  //The code below is used to check if an already existing user has modified the password. Without this check, if, for example, a user modifies their name, their password will be re-hashed.
+  if (!this.isModified('password')) {
+    next();
+  } else {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+});
+
 const User = mongoose.model('User', userSchema);
 
 export default User;
