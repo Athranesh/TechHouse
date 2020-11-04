@@ -28,7 +28,7 @@ const LoginScreen = ({ history, location }) => {
     return function cleanUp() {
       dispatch(clearError());
     };
-  }, [history, userInfo, redirect, clearError]);
+  }, [history, userInfo, redirect, dispatch]);
 
   const submitHandler = (e) => {
     e.preventDefault();

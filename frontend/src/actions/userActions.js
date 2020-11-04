@@ -4,6 +4,7 @@ import {
   USER_LOGIN_SUCCESS,
   USER_LOGIN_FAIL,
   CLEAR_ERROR,
+  USER_LOGOUT,
 } from '../types/userTypes';
 
 export const login = (email, password) => async (dispatch) => {
@@ -40,6 +41,14 @@ export const login = (email, password) => async (dispatch) => {
           : error.message,
     });
   }
+};
+
+export const logout = () => {
+  localStorage.removeItem('userInfo');
+
+  return {
+    type: USER_LOGOUT,
+  };
 };
 
 export const clearError = () => {

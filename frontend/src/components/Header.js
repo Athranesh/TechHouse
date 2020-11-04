@@ -1,9 +1,15 @@
 import React from 'react';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import useLogout from '../hooks/useLogout';
 
-function Header() {
-  //to be changed when admin panel is added
+const Header = () => {
+  const userLogin = useSelector((state) => state.userLogin);
+
+  const { userInfo } = userLogin;
+
+  const logout = useLogout();
 
   return (
     <header>
@@ -25,16 +31,26 @@ function Header() {
               </Nav.Link>
             </LinkContainer>
 
-            <LinkContainer to="login">
-              <Nav.Link className="mr-4 mr-sm-0">
-                <i className="fas fa-user"></i> Sign In
-              </Nav.Link>
-            </LinkContainer>
+            {userInfo ? (
+              <NavDropdown title={userInfo.name} id="username">
+                <LinkContainer to="/profile">
+                  <NavDropdown.Item>Profile</NavDropdown.Item>
+                </LinkContainer>
+
+                <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              <LinkContainer to="login">
+                <Nav.Link className="mr-4 mr-sm-0">
+                  <i className="fas fa-user"></i> Sign In
+                </Nav.Link>
+              </LinkContainer>
+            )}
           </Nav>
         </Container>
       </Navbar>
     </header>
   );
-}
+};
 
 export default Header;
