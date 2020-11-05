@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
@@ -24,6 +25,8 @@ function App() {
           {/* <Route path="/cart/:id?/:qty?" component={CartScreen} /> */}
 
           <Route path="/login" component={LoginScreen} />
+
+          <Route path="/register" component={RegisterScreen} />
         </Container>
       </main>
       <Footer />
