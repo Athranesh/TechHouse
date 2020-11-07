@@ -15,6 +15,7 @@ import {
   CLEAR_DETAILS_ERROR,
   USER_DETAILS_UPDATE_SUCCESS,
   USER_DETAILS_UPDATE_RESET,
+  USER_DETAILS_UPDATE_FAIL,
 } from '../types/userTypes';
 
 export const login = (email, password) => async (dispatch) => {
@@ -157,8 +158,6 @@ export const updateUserDetails = (details) => async (dispatch, getState) => {
   dispatch({ type: USER_DETAILS_REQUEST });
 
   try {
-    const { userInfo } = getState().userDetails;
-
     const { token } = getState().userLogin.userInfo;
 
     const config = {
@@ -172,7 +171,7 @@ export const updateUserDetails = (details) => async (dispatch, getState) => {
 
     dispatch({
       type: USER_DETAILS_UPDATE_SUCCESS,
-      payload: { ...data },
+      payload: data,
     });
 
     //It is important for the app to update the login info as well, for example to change the navbar user's name.
@@ -181,7 +180,7 @@ export const updateUserDetails = (details) => async (dispatch, getState) => {
     localStorage.setItem('userInfo', JSON.stringify(data));
   } catch (error) {
     dispatch({
-      type: USER_DETAILS_FAIL,
+      type: USER_DETAILS_UPDATE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

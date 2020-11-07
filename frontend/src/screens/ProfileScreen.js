@@ -11,11 +11,12 @@ import {
   resetUpdate,
 } from '../actions/userActions';
 
-const ProfileScreen = ({ history, location }) => {
+const ProfileScreen = ({ history }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState(null);
 
   const dispatch = useDispatch();
@@ -33,14 +34,20 @@ const ProfileScreen = ({ history, location }) => {
       history.push('/login');
     } else {
       if (!userInfo) {
-        dispatch(getUserDetails());
+        if (!loading) {
+          dispatch(getUserDetails());
+        }
       } else {
         setName(userInfo.name);
         setEmail(userInfo.email);
 
         if (updated) {
           dispatch(resetUpdate());
-          setMessage('Profile Updated');
+          if (!error) {
+            setMessage('Profile Updated');
+          } else {
+            setMessage(error);
+          }
         }
       }
     }
@@ -48,23 +55,33 @@ const ProfileScreen = ({ history, location }) => {
     return function cleanUp() {
       dispatch(clearDetailsError());
     };
-  }, [history, userInfo, dispatch, userLoginInfo, updated]);
+  }, [history, userInfo, dispatch, userLoginInfo, updated, error, loading]);
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    const details = { name, email };
-
-    if (password.length) {
+    if (password.length && confirmPassword.length) {
       if (password === confirmPassword) {
-        if (message) setMessage(null);
+        //Creating new details object
+        const details = { name, email, password };
 
-        details.password = password;
+        //Adding new password to details object
+        if (newPassword.length) {
+          if (message) setMessage(null);
+          details.newPassword = newPassword;
+        }
+
+        dispatch(updateUserDetails(details));
+
+        setNewPassword('');
+        setPassword('');
+        setConfirmPassword('');
       } else {
-        setMessage('Passwords do not match');
+        setMessage('Current passwords do not match');
       }
+    } else {
+      setMessage('Please enter and confirm your current password');
     }
-    dispatch(updateUserDetails(details));
   };
 
   const renderScreen = () => {
@@ -73,10 +90,7 @@ const ProfileScreen = ({ history, location }) => {
     } else {
       return (
         <>
-          <Form
-            onSubmit={submitHandler}
-            // style={{ paddingTop: error || loading ? '0' : '63px' }}
-          >
+          <Form onSubmit={submitHandler}>
             <Form.Group controlId="name">
               <Form.Label>Username</Form.Label>
               <Form.Control
@@ -99,11 +113,22 @@ const ProfileScreen = ({ history, location }) => {
                 }}
               ></Form.Control>
             </Form.Group>
-            <Form.Group controlId="password">
-              <Form.Label>Password</Form.Label>
+            <Form.Group controlId="new-password">
+              <Form.Label>New Password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Enter Password"
+                placeholder="Enter New Password"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                }}
+              ></Form.Control>
+            </Form.Group>
+            <Form.Group controlId="password">
+              <Form.Label>Current Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter Current Password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -112,10 +137,10 @@ const ProfileScreen = ({ history, location }) => {
             </Form.Group>
 
             <Form.Group controlId="confirm-password">
-              <Form.Label>Confirm Password</Form.Label>
+              <Form.Label>Confirm Current Password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Confirm Password"
+                placeholder="Confirm Current Password"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);

@@ -14,6 +14,7 @@ import {
   CLEAR_DETAILS_ERROR,
   USER_DETAILS_UPDATE_SUCCESS,
   USER_DETAILS_UPDATE_RESET,
+  USER_DETAILS_UPDATE_FAIL,
 } from '../types/userTypes';
 
 export const userLoginReducer = (
@@ -62,10 +63,24 @@ export const userRegisterReducer = (
 };
 
 export const userDetailsReducer = (
-  state = { loading: false, userInfo: null, error: null, updated: false },
+  state = {
+    loading: false,
+    userInfo: null,
+    error: null,
+    updated: false,
+    updateError: null,
+  },
   action
 ) => {
   switch (action.type) {
+    case USER_LOGOUT:
+      return {
+        loading: false,
+        userInfo: null,
+        error: null,
+        updated: false,
+        updateError: null,
+      };
     case USER_DETAILS_REQUEST:
       return { ...state, loading: true };
 
@@ -86,7 +101,15 @@ export const userDetailsReducer = (
     case USER_DETAILS_UPDATE_RESET:
       return {
         ...state,
+        loading: false,
         updated: false,
+      };
+    case USER_DETAILS_UPDATE_FAIL:
+      return {
+        ...state,
+        loading: false,
+        updated: true,
+        error: action.payload,
       };
 
     case USER_DETAILS_FAIL:
