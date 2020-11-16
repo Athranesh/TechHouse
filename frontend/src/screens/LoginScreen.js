@@ -6,6 +6,7 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 import { login, clearLoginError } from '../actions/userActions';
+import CheckoutSteps from '../components/CheckoutSteps';
 
 const LoginScreen = ({ history, location }) => {
   const [email, setEmail] = useState('');
@@ -18,6 +19,8 @@ const LoginScreen = ({ history, location }) => {
   const { loading, error, userInfo } = userLogin;
 
   const redirect = location.search ? location.search.split('=')[1] : '/';
+
+  const step = location.search ? location.search.split('&')[0] : null;
 
   useEffect(() => {
     if (userInfo) {
@@ -90,6 +93,7 @@ const LoginScreen = ({ history, location }) => {
 
   return (
     <FormContainer>
+      {step && <CheckoutSteps step1 />}
       <h1>Sign In</h1>
       {error && <Message variant="danger">{error}</Message>}
       {renderScreen()}

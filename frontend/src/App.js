@@ -8,6 +8,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import ShippingScreen from './screens/ShippingScreen';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ProductScreen from './screens/ProductScreen';
+import PaymentScreen from './screens/PaymentScreen';
 import CartScreen from './screens/CartScreen';
 
 import { Container } from 'react-bootstrap';
@@ -33,6 +34,8 @@ function App() {
           <Route path="/profile" component={ProfileScreen} />
 
           <Route path="/shipping" component={ShippingScreen} />
+
+          <Route path="/payment" component={PaymentScreen} />
         </Container>
       </main>
       <Footer />
