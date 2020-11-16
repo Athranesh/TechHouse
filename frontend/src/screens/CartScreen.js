@@ -40,7 +40,7 @@ const CartScreen = ({ match, location, history }) => {
     dispatch(removeFromCart(id));
   };
   const checkOuthandler = (id) => {
-    history.push('/login?redirect=shipping=step');
+    history.push('/login?step&redirect=shipping');
   };
 
   return (

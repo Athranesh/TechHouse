@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
+import { createOrder } from '../actions/orderActions';
 
 const OrderScreen = ({ history }) => {
   const cart = useSelector((state) => state.cart);
@@ -32,14 +33,29 @@ const OrderScreen = ({ history }) => {
 
   const paymentMethod = cart.paymentMethod;
 
+  const orderCreate = useSelector((state) => state.orderCreate);
+
   if (!existingAddress) {
     history.push('/shipping');
   } else if (!paymentMethod) {
     history.push('/payment');
   }
 
+  const { order, success, error } = orderCreate;
+  useEffect(() => {
+    if (success) {
+      history.push(`/order/${order._id}`);
+    }
+  }, [history, success, order]);
+
   const placeOrderHandler = () => {
-    console.log('order');
+    const orderData = { ...cart };
+
+    //The POST request must contain an array named "orderItems" and not "cartItems", below operation is that name change.
+    orderData.orderItems = cart.cartItems;
+    delete orderData.cartItems;
+
+    dispatch(createOrder(orderData));
   };
 
   return (
@@ -127,6 +143,11 @@ const OrderScreen = ({ history }) => {
                   <Col>${cart.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
+
+              <ListGroup.Item>
+                {error && <Message variant="danger">{error}</Message>}
+              </ListGroup.Item>
+
               <ListGroup.Item>
                 <Button
                   type="button"
