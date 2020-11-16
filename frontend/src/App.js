@@ -36,6 +36,8 @@ function App() {
           <Route path="/shipping" component={ShippingScreen} />
 
           <Route path="/payment" component={PaymentScreen} />
+
+          {/* <Route path="/placeorder" component={PaymentScreen} /> */}
         </Container>
       </main>
       <Footer />
