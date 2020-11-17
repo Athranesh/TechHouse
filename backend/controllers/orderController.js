@@ -1,4 +1,5 @@
 import Order from '../models/orderModel.js';
+import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
 
 export const saveOrder = asyncHandler(async (req, res) => {
@@ -29,6 +30,12 @@ export const saveOrder = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
+    const user = await User.findById(req.user._id);
+
+    user.orders.push(createdOrder);
+
+    const savedOrder = await user.save();
+
     res.status(201).json(createdOrder);
   }
 });
@@ -45,8 +52,8 @@ export const getOrderById = asyncHandler(async (req, res) => {
     if (order.user._id.equals(req.user._id)) {
       res.json(order);
     } else {
-      res.status(400);
-      throw new Error('Wrong order requested');
+      res.status(401);
+      throw new Error('You do not have permission to view this order');
     }
   } else {
     res.status(404);

@@ -8,6 +8,8 @@ import {
   GET_ORDER_SUCCESS,
 } from '../types/orderTypes';
 
+import { CLEAR_DETAILS } from '../types/userTypes';
+
 export const createOrder = (orderData) => async (dispatch, getState) => {
   try {
     dispatch({
@@ -29,6 +31,7 @@ export const createOrder = (orderData) => async (dispatch, getState) => {
       type: ORDER_CREATE_SUCCESS,
       payload: data,
     });
+    dispatch({});
   } catch (error) {
     dispatch({
       type: ORDER_CREATE_FAIL,
@@ -60,6 +63,11 @@ export const getOrderById = (id) => async (dispatch, getState) => {
     dispatch({
       type: GET_ORDER_SUCCESS,
       payload: data,
+    });
+
+    //Resetting user profile data after a new order is created
+    dispatch({
+      type: CLEAR_DETAILS,
     });
   } catch (error) {
     //A customized error message below

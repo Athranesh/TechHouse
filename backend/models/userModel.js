@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { orderSchema } from './orderModel.js';
 
 const userSchema = mongoose.Schema(
   {
@@ -21,6 +22,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
+    orders: [orderSchema],
   },
   {
     timestamps: true,

@@ -12,6 +12,7 @@ import {
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAIL,
   CLEAR_DETAILS_ERROR,
+  CLEAR_DETAILS,
   USER_DETAILS_UPDATE_SUCCESS,
   USER_DETAILS_UPDATE_RESET,
   USER_DETAILS_UPDATE_FAIL,
@@ -116,6 +117,15 @@ export const userDetailsReducer = (
       return { loading: false, userInfo: null, error: action.payload };
     case CLEAR_DETAILS_ERROR:
       return { ...state, error: null };
+
+    case CLEAR_DETAILS:
+      return {
+        loading: false,
+        userInfo: null,
+        error: null,
+        updated: false,
+        updateError: null,
+      };
 
     default:
       return state;

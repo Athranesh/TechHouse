@@ -13,6 +13,7 @@ import {
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAIL,
   CLEAR_DETAILS_ERROR,
+  CLEAR_DETAILS,
   USER_DETAILS_UPDATE_SUCCESS,
   USER_DETAILS_UPDATE_RESET,
   USER_DETAILS_UPDATE_FAIL,
@@ -148,6 +149,13 @@ export const clearDetailsError = () => {
     type: CLEAR_DETAILS_ERROR,
   };
 };
+
+export const clearDetails = () => {
+  return {
+    type: CLEAR_DETAILS,
+  };
+};
+
 export const resetUpdate = () => {
   return {
     type: USER_DETAILS_UPDATE_RESET,

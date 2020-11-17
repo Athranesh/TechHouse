@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, ListGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import { Link } from 'react-router-dom';
 
 import {
   getUserDetails,
@@ -84,6 +85,18 @@ const ProfileScreen = ({ history }) => {
     }
   };
 
+  const renderOrderLinks = () => {
+    if (userInfo && userInfo.orders.length) {
+      return userInfo.orders.map((order) => {
+        return (
+          <ListGroup.Item key={order._id}>
+            <Link to={`/order/${order._id}`}>{order._id}</Link>
+          </ListGroup.Item>
+        );
+      });
+    }
+  };
+
   const renderScreen = () => {
     if (loading) {
       return <Loader />;
@@ -158,21 +171,27 @@ const ProfileScreen = ({ history }) => {
   };
 
   return (
-    <Row>
-      <Col md={3}>
-        <h2>User Profile</h2>
-        {error && <Message variant="danger">{error}</Message>}
-        {message && (
-          <Message
-            variant={message === 'Profile Updated' ? 'success' : 'danger'}
-          >
-            {message}
-          </Message>
-        )}
-        {renderScreen()}
-      </Col>
-      <Col md={9}>My Orders</Col>
-    </Row>
+    <>
+      {' '}
+      <h2>User Profile</h2>
+      <Row>
+        <Col md={3} style={{ marginBottom: 30 }}>
+          {error && <Message variant="danger">{error}</Message>}
+          {message && (
+            <Message
+              variant={message === 'Profile Updated' ? 'success' : 'danger'}
+            >
+              {message}
+            </Message>
+          )}
+          {renderScreen()}
+        </Col>
+        <Col md={9}>
+          <h6>My Orders</h6>
+          <ListGroup>{renderOrderLinks()}</ListGroup>
+        </Col>
+      </Row>
+    </>
   );
 };
 

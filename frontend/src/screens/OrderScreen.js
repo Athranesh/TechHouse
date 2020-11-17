@@ -9,11 +9,25 @@ import Message from '../components/Message';
 const OrderScreen = ({ history, match }) => {
   const dispatch = useDispatch();
 
+  const addDecimals = (num) => {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  };
+
   const orderData = useSelector((state) => state.getOrder);
 
   const { userInfo } = useSelector((state) => state.userLogin);
 
   const { loading, error, order } = orderData;
+
+  if (order) {
+    order.itemsPrice = addDecimals(
+      order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
+    );
+
+    order.shippingPrice = addDecimals(order.itemsPrice > 100 ? 0 : 100);
+
+    order.taxPrice = addDecimals(Number((0.15 * order.itemsPrice).toFixed(2)));
+  }
 
   useEffect(() => {
     //Access prohibited in case no user is logged in
@@ -21,7 +35,10 @@ const OrderScreen = ({ history, match }) => {
       history.push('/');
     } else {
       //Loading added below to prevent another request when loading is in progress. Error added because, in case it is not added, if there is an error, there will be an infinite rerender.
-      if (!order && !loading && !error) {
+      if (
+        (!order && !loading && !error) ||
+        (order && order._id !== match.params.id)
+      ) {
         dispatch(getOrderById(match.params.id));
       }
     }
@@ -42,17 +59,41 @@ const OrderScreen = ({ history, match }) => {
                 <ListGroup.Item>
                   <h2>Shipping</h2>
                   <p>
+                    <strong>Name:</strong> {order.user.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong>{' '}
+                    <a href={`mailto:${order.user.email}`}>
+                      {order.user.email}
+                    </a>
+                  </p>
+
+                  <p>
                     <strong>Address: </strong>
                     {order.shippingAddress &&
                       order.shippingAddress.address},{' '}
                     {order.shippingAddress && order.shippingAddress.city},
                     {order.shippingAddress && order.shippingAddress.postalCode}
                   </p>
+                  {order.isDeilvered ? (
+                    <Message variant="success">
+                      Deilvered at {order.deilveredAt}
+                    </Message>
+                  ) : (
+                    <Message variant="danger">Not Deilvered</Message>
+                  )}
                 </ListGroup.Item>
 
                 <ListGroup.Item>
                   <h2>Payment Method</h2>
-                  <strong>Method: {order.paymentMethod}</strong>
+                  <p>
+                    <strong>Method: {order.paymentMethod}</strong>
+                  </p>
+                  {order.isPaid ? (
+                    <Message variant="success">Paid on {order.paidAt}</Message>
+                  ) : (
+                    <Message variant="danger">Not Paid</Message>
+                  )}
                 </ListGroup.Item>
 
                 <ListGroup.Item>
