@@ -62,12 +62,13 @@ export const getOrderById = (id) => async (dispatch, getState) => {
       payload: data,
     });
   } catch (error) {
+    //A customized error message below
     dispatch({
       type: GET_ORDER_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
-          : error.message,
+          : 'Request failed',
     });
   }
 };

@@ -37,7 +37,7 @@ export const orderCreateReducer = (
 };
 
 export const getOrderReducer = (
-  state = { loading: false, order: null, success: false },
+  state = { loading: false, order: null, error: false },
   action
 ) => {
   switch (action.type) {
@@ -49,14 +49,14 @@ export const getOrderReducer = (
     case GET_ORDER_SUCCESS:
       return {
         loading: false,
-        success: true,
+        error: null,
         order: action.payload,
       };
 
     case GET_ORDER_FAIL:
       return {
         loading: false,
-        success: false,
+        order: null,
         error: action.payload,
       };
 
