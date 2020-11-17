@@ -22,41 +22,33 @@ const ProfileScreen = ({ history }) => {
 
   const dispatch = useDispatch();
 
-  const userDetails = useSelector((state) => state.userDetails);
-  const { error, loading, userInfo, updated } = userDetails;
+  const { error, loading, userInfo, updated } = useSelector(
+    (state) => state.userDetails
+  );
 
-  const userLogin = useSelector((state) => state.userLogin);
+  if (userInfo) {
+    if (!name && userInfo.name) setName(userInfo.name);
+    if (!email && userInfo.email) setEmail(userInfo.email);
+  }
 
-  const userLoginInfo = userLogin.userInfo;
+  if (updated && !error) {
+    if (!message) setMessage('Profile updated');
+  }
+
+  const userLoginInfo = useSelector((state) => state.userLogin.userInfo);
 
   useEffect(() => {
     if (!userLoginInfo) {
-      //Redirecting to homepage if the user is not logged in
       history.push('/login');
     } else {
-      if (!userInfo) {
-        if (!loading) {
-          dispatch(getUserDetails());
-        }
-      } else {
-        setName(userInfo.name);
-        setEmail(userInfo.email);
-
-        if (updated) {
-          dispatch(resetUpdate());
-          if (!error) {
-            setMessage('Profile Updated');
-          } else {
-            setMessage(error);
-          }
-        }
-      }
+      dispatch(getUserDetails());
     }
 
     return function cleanUp() {
       dispatch(clearDetailsError());
+      dispatch(resetUpdate());
     };
-  }, [history, userInfo, dispatch, userLoginInfo, updated, error, loading]);
+  }, [dispatch, history, userLoginInfo]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -90,7 +82,7 @@ const ProfileScreen = ({ history }) => {
       return userInfo.orders.map((order) => {
         return (
           <ListGroup.Item key={order._id}>
-            <Link to={`/order/${order._id}`}>{order._id}</Link>
+            <Link to={`/order/${order._id}`}>Order ID: {order._id}</Link>
           </ListGroup.Item>
         );
       });
@@ -178,11 +170,7 @@ const ProfileScreen = ({ history }) => {
         <Col md={3} style={{ marginBottom: 30 }}>
           {error && <Message variant="danger">{error}</Message>}
           {message && (
-            <Message
-              variant={message === 'Profile Updated' ? 'success' : 'danger'}
-            >
-              {message}
-            </Message>
+            <Message variant={!error ? 'success' : 'danger'}>{message}</Message>
           )}
           {renderScreen()}
         </Col>
