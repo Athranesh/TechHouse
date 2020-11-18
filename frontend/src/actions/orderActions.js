@@ -6,6 +6,9 @@ import {
   GET_ORDER_FAIL,
   GET_ORDER_REQUEST,
   GET_ORDER_SUCCESS,
+  ORDER_PAY_FAIL,
+  ORDER_PAY_REQUEST,
+  ORDER_PAY_SUCCESS,
 } from '../types/orderTypes';
 
 import { CLEAR_DETAILS } from '../types/userTypes';
@@ -73,6 +76,43 @@ export const getOrderById = (id) => async (dispatch, getState) => {
     //A customized error message below
     dispatch({
       type: GET_ORDER_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : 'Request failed',
+    });
+  }
+};
+
+export const payOrder = (id, paymentResult) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: ORDER_PAY_REQUEST,
+    });
+
+    const { token } = getState().userLogin.userInfo;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.put(
+      `/api/orders/${id}/pay`,
+      paymentResult,
+      config
+    );
+
+    dispatch({
+      type: ORDER_PAY_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    //A customized error message below
+    dispatch({
+      type: ORDER_PAY_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
