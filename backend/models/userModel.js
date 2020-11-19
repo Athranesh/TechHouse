@@ -22,7 +22,12 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
-    orders: [orderSchema],
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+      },
+    ],
   },
   {
     timestamps: true,

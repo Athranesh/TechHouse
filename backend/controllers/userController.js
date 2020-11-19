@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
   //req.user is not sent by the client, it is added by "protect" middleware that finds the user based on token.
 
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).populate('orders');
 
   if (user) {
     res.json({

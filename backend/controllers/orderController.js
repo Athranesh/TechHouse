@@ -76,7 +76,24 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
       email_address: req.body.payer.email_address,
     };
 
+    //Updating the object in user's collection
+    // const user = await User.findById(req.user._id);
+
+    // const userOrder = user.orders.find((userOrder) =>
+    //   userOrder._id.equals(order._id)
+    // );
+
+    // userOrder.isPaid = true;
+    // userOrder.paidAt = order.paidAt;
+    // userOrder.paymentResult = {
+    //   id: req.body.id,
+    //   status: req.body.status,
+    //   update_time: req.body.update_time,
+    //   email_address: req.body.payer.email_address,
+    // };
+
     const updatedOrder = await order.save();
+    // const updatedUser = await user.save();
 
     res.json(updatedOrder);
   } else {
