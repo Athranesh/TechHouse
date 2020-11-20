@@ -16,6 +16,14 @@ import {
   USER_DETAILS_UPDATE_SUCCESS,
   USER_DETAILS_UPDATE_RESET,
   USER_DETAILS_UPDATE_FAIL,
+  USER_LIST_SUCCESS,
+  USER_LIST_FAIL,
+  USER_LIST_REQUEST,
+  USER_LIST_RESET,
+  DELETE_USER_FAIL,
+  DELETE_USER_REQUEST,
+  DELETE_USER_RESET,
+  DELETE_USER_SUCCESS,
 } from '../types/userTypes';
 
 export const userLoginReducer = (
@@ -57,6 +65,24 @@ export const userRegisterReducer = (
 
     case CLEAR_REGISTER_ERROR:
       return { ...state, error: null };
+
+    default:
+      return state;
+  }
+};
+export const userListReducer = (state = { users: [] }, action) => {
+  switch (action.type) {
+    case USER_LIST_REQUEST:
+      return { loading: true };
+
+    case USER_LIST_SUCCESS:
+      return { loading: false, users: action.payload };
+
+    case USER_LIST_FAIL:
+      return { loading: false, error: action.payload };
+
+    case USER_LIST_RESET:
+      return { users: [] };
 
     default:
       return state;
@@ -126,6 +152,32 @@ export const userDetailsReducer = (
         updated: false,
         updateError: null,
       };
+
+    default:
+      return state;
+  }
+};
+
+export const deleteUserReducer = (
+  state = { loading: false, success: false, error: null },
+  action
+) => {
+  switch (action.type) {
+    case DELETE_USER_REQUEST:
+      return { loading: true, success: false, error: null };
+
+    case DELETE_USER_SUCCESS:
+      return { loading: false, success: true, error: null };
+
+    case DELETE_USER_FAIL:
+      return {
+        loading: false,
+        success: false,
+        error: action.payload,
+      };
+
+    case DELETE_USER_RESET:
+      return { loading: false, success: false, error: null };
 
     default:
       return state;

@@ -12,6 +12,7 @@ import PaymentScreen from './screens/PaymentScreen';
 import CartScreen from './screens/CartScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
+import UserListScreen from './screens/UserListScreen';
 
 import { Container } from 'react-bootstrap';
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="/placeorder" component={PlaceOrderScreen} />
 
           <Route path="/order/:id" component={OrderScreen} />
+          <Route path="/admin/userlist" component={UserListScreen} />
         </Container>
       </main>
       <Footer />

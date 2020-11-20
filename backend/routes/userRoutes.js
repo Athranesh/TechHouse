@@ -4,15 +4,17 @@ import {
   getUserProfile,
   registerUser,
   updateUserProfile,
+  getUsers,
+  deleteUser,
 } from '../controllers/userController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/').post(registerUser);
 router.route('/login').post(authUser);
-
-//To implement middleware to routes, simply add them as an argument. Protect here is a middleware
+router.route('/').get(protect, admin, getUsers);
+router.route('/:id').delete(protect, admin, deleteUser);
 router
   .route('/profile')
   .get(protect, getUserProfile)
