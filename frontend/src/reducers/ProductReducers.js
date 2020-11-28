@@ -5,6 +5,11 @@ import {
   PRODUCT_REQUEST,
   PRODUCT_SUCCESS,
   PRODUCT_FAIL,
+  PRODUCT_LIST_RESET,
+  DELETE_PRODUCT_REQUEST,
+  DELETE_PRODUCT_RESET,
+  DELETE_PRODUCT_SUCCESS,
+  DELETE_PRODUCT_FAIL,
 } from '../types/productTypes';
 
 export const productListReducer = (
@@ -20,6 +25,8 @@ export const productListReducer = (
 
     case PRODUCT_LIST_FAIL:
       return { loading: false, error: action.payload };
+    case PRODUCT_LIST_RESET:
+      return { loading: false, products: [], error: null };
 
     default:
       return state;
@@ -37,6 +44,29 @@ export const productDetailsReducer = (
       return { loading: false, product: action.payload };
     case PRODUCT_FAIL:
       return { loading: false, error: action.payload };
+
+    default:
+      return state;
+  }
+};
+
+export const deleteProductReducer = (
+  state = {
+    loading: false,
+    error: null,
+    success: false,
+  },
+  action
+) => {
+  switch (action.type) {
+    case DELETE_PRODUCT_REQUEST:
+      return { loading: true, error: null, success: false };
+    case DELETE_PRODUCT_SUCCESS:
+      return { loading: false, error: null, success: true };
+    case DELETE_PRODUCT_FAIL:
+      return { loading: false, error: action.payload, success: false };
+    case DELETE_PRODUCT_RESET:
+      return { loading: false, error: null, success: false };
 
     default:
       return state;

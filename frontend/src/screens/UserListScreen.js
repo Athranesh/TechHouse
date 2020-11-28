@@ -13,27 +13,29 @@ const UserListScreen = ({ history }) => {
 
   const { users, loading, error } = useSelector((state) => state.userList);
 
-  const { isAdmin } = useSelector((state) => state.userLogin.userInfo);
+  const userLogin = useSelector((state) => state.userLogin);
 
-  const { loading: deleteLoading, success: deleteSuccess } = useSelector(
-    (state) => state.deleteUser
-  );
+  const { success: deleteSuccess } = useSelector((state) => state.deleteUser);
 
   //Handling cleanup of users data
   useEffect(() => {
     return () => {
       dispatch({ type: DELETE_USER_RESET });
+      dispatch({ type: USER_LIST_RESET });
     };
   }, [dispatch]);
 
   //Handing initial load
   useEffect(() => {
-    if (!isAdmin) {
+    if (
+      !userLogin.userInfo ||
+      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
+    ) {
       history.push('/login');
     } else {
       dispatch(listUsers());
     }
-  }, [dispatch, isAdmin, history]);
+  }, [dispatch, userLogin, history]);
 
   //Handling user deletion
   useEffect(() => {
@@ -41,12 +43,12 @@ const UserListScreen = ({ history }) => {
       setMessage('User deleted');
       dispatch(listUsers());
     }
-
-    return () => dispatch({ type: USER_LIST_RESET });
   }, [dispatch, deleteSuccess]);
 
   const deleteHandler = (id) => {
-    dispatch(deleteUser(id));
+    if (window.confirm('Are you sure? This action is  irreversible!')) {
+      dispatch(deleteUser(id));
+    }
   };
 
   return (
@@ -84,7 +86,7 @@ const UserListScreen = ({ history }) => {
                   )}
                 </td>
                 <td>
-                  <LinkContainer to={`/user/${user._id}/edit`}>
+                  <LinkContainer to={`/admin/user/${user._id}/edit`}>
                     <Button variant="light" className="btn-sm">
                       <i className="fas fa-edit"></i>
                     </Button>

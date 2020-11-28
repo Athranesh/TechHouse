@@ -120,6 +120,67 @@ export const register = (name, email, password) => async (dispatch) => {
   }
 };
 
+//To be used by admin
+export const getUserById = (id) => async (dispatch, getState) => {
+  dispatch({ type: USER_DETAILS_REQUEST });
+
+  try {
+    const { userInfo } = getState().userLogin;
+
+    const config = {
+      headers: {
+        'Content-type': 'application/json',
+        authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/users/admin/${id}`, config);
+
+    dispatch({
+      type: USER_DETAILS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: USER_DETAILS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+//To be used by admin
+export const updateUserById = (id, details) => async (dispatch, getState) => {
+  dispatch({ type: USER_DETAILS_REQUEST });
+
+  try {
+    const { token } = getState().userLogin.userInfo;
+
+    const config = {
+      headers: {
+        'Content-type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.put(`/api/users/admin/${id}`, details, config);
+
+    dispatch({
+      type: USER_DETAILS_UPDATE_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: USER_DETAILS_UPDATE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
 export const getUserDetails = () => async (dispatch, getState) => {
   dispatch({ type: USER_DETAILS_REQUEST });
 
@@ -216,7 +277,7 @@ export const listUsers = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get('/api/users', config);
+    const { data } = await axios.get('/api/users/admin', config);
 
     dispatch({
       type: USER_LIST_SUCCESS,
@@ -246,7 +307,7 @@ export const deleteUser = (id) => async (dispatch, getState) => {
       },
     };
 
-    await axios.delete(`/api/users/${id}`, config);
+    await axios.delete(`/api/users/admin/${id}`, config);
 
     dispatch({ type: DELETE_USER_SUCCESS });
   } catch (error) {

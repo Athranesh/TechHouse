@@ -27,11 +27,6 @@ const ProfileScreen = ({ history }) => {
     (state) => state.userDetails
   );
 
-  if (userInfo) {
-    if (!name && userInfo.name) setName(userInfo.name);
-    if (!email && userInfo.email) setEmail(userInfo.email);
-  }
-
   if (updated && !error) {
     if (!message) setMessage('Profile updated');
   }
@@ -41,15 +36,21 @@ const ProfileScreen = ({ history }) => {
   useEffect(() => {
     if (!userLoginInfo) {
       history.push('/login');
-    } else {
-      dispatch(getUserDetails());
     }
-
-    return function cleanUp() {
+    return () => {
       dispatch(clearDetailsError());
       dispatch(resetUpdate());
     };
   }, [dispatch, history, userLoginInfo]);
+
+  useEffect(() => {
+    if (!userInfo) {
+      dispatch(getUserDetails());
+    } else {
+      setName(userInfo.name);
+      setEmail(userInfo.email);
+    }
+  }, [dispatch, history, userInfo, userLoginInfo]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -216,8 +217,12 @@ const ProfileScreen = ({ history }) => {
           {renderScreen()}
         </Col>
         <Col md={9}>
-          <h6>My Orders</h6>
-          <ListGroup>{renderOrderLinks()}</ListGroup>
+          {!userLoginInfo.isAdmin && (
+            <>
+              <h6>My Orders</h6>
+              <ListGroup>{renderOrderLinks()}</ListGroup>
+            </>
+          )}
         </Col>
       </Row>
     </>
