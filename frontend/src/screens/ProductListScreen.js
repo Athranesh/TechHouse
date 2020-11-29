@@ -36,6 +36,7 @@ const ProductListScreen = ({ history, match }) => {
     };
   }, [dispatch]);
 
+  //Handing product successful deletion
   useEffect(() => {
     if (deleteSuccess) {
       setMessage('Product deleted');
