@@ -34,7 +34,7 @@ export const saveOrder = asyncHandler(async (req, res) => {
 
     user.orders.push(createdOrder);
 
-    const savedOrder = await user.save();
+    await user.save();
 
     res.status(201).json(createdOrder);
   }
@@ -76,22 +76,6 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
       email_address: req.body.payer.email_address,
     };
 
-    //Updating the object in user's collection
-    // const user = await User.findById(req.user._id);
-
-    // const userOrder = user.orders.find((userOrder) =>
-    //   userOrder._id.equals(order._id)
-    // );
-
-    // userOrder.isPaid = true;
-    // userOrder.paidAt = order.paidAt;
-    // userOrder.paymentResult = {
-    //   id: req.body.id,
-    //   status: req.body.status,
-    //   update_time: req.body.update_time,
-    //   email_address: req.body.payer.email_address,
-    // };
-
     const updatedOrder = await order.save();
     // const updatedUser = await user.save();
 
@@ -99,5 +83,16 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   } else {
     res.status(404);
     throw new Error('Order not found');
+  }
+});
+
+export const getOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({}).populate('user', 'id name email');
+
+  if (orders) {
+    res.json(orders);
+  } else {
+    res.status(404);
+    throw new Error('Not found');
   }
 });

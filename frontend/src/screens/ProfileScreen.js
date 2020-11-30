@@ -217,12 +217,10 @@ const ProfileScreen = ({ history }) => {
           {renderScreen()}
         </Col>
         <Col md={9}>
-          {!userLoginInfo.isAdmin && (
-            <>
-              <h6>My Orders</h6>
-              <ListGroup>{renderOrderLinks()}</ListGroup>
-            </>
-          )}
+          <>
+            <h6>My Orders</h6>
+            <ListGroup>{renderOrderLinks()}</ListGroup>
+          </>
         </Col>
       </Row>
     </>

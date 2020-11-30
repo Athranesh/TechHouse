@@ -8,6 +8,8 @@ import FormContainer from '../components/FormContainer';
 
 import { updateProduct, getProduct } from '../actions/ProductActions';
 
+import { PRODUCT_RESET } from '../types/productTypes';
+
 import axios from 'axios';
 
 const ProductEditScreen = ({ history, match }) => {
@@ -67,6 +69,7 @@ const ProductEditScreen = ({ history, match }) => {
   useEffect(() => {
     if (success) {
       history.push('/admin/productlist');
+      dispatch({ type: PRODUCT_RESET });
     }
   }, [success, history]);
 
