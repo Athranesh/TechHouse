@@ -8,8 +8,10 @@ import { listProducts, deleteProductById } from '../actions/ProductActions';
 import {
   PRODUCT_LIST_RESET,
   DELETE_PRODUCT_RESET,
+  CREATE_PRODUCT_RESET,
 } from '../types/productTypes';
-const ProductListScreen = ({ history, match }) => {
+
+const ProductListScreen = ({ history, location }) => {
   const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
@@ -24,25 +26,23 @@ const ProductListScreen = ({ history, match }) => {
     (state) => state.deleteProduct
   );
 
-  // const { success: deleteSuccess } = useSelector(
-  //   (state) => state.deleteProduct
-  // );
+  const { success: createSuccess } = useSelector(
+    (state) => state.createProduct
+  );
 
-  //Handling cleanup of products data
-  useEffect(() => {
-    return () => {
-      dispatch({ type: DELETE_PRODUCT_RESET });
-      dispatch({ type: PRODUCT_LIST_RESET });
-    };
-  }, [dispatch]);
-
-  //Handing product successful deletion
   useEffect(() => {
     if (deleteSuccess) {
       setMessage('Product deleted');
       dispatch(listProducts());
+    } else if (createSuccess) {
+      setMessage('Product created');
+      dispatch({ type: CREATE_PRODUCT_RESET });
     }
-  }, [dispatch, deleteSuccess]);
+    return () => {
+      dispatch({ type: DELETE_PRODUCT_RESET });
+      dispatch({ type: PRODUCT_LIST_RESET });
+    };
+  }, [dispatch, deleteSuccess, createSuccess]);
 
   //Handing initial load
   useEffect(() => {
@@ -59,17 +59,20 @@ const ProductListScreen = ({ history, match }) => {
   const deleteProductHandler = (id) => {
     dispatch(deleteProductById(id));
   };
-  const createProductHandler = () => {};
 
   return (
     <>
       <Row className="align-items-center">
         <Col>
           <h1>Products</h1>
-          <Col className="text-right">
-            <Button className="my-3" onClick={createProductHandler}>
-              <i className="fas fa-plus"></i>Create Product
-            </Button>
+
+          <Col className="text-right p-0">
+            <LinkContainer
+              to={`/admin/createproduct`}
+              className="my-3 justify-content-end"
+            >
+              <Button>Create Product</Button>
+            </LinkContainer>
           </Col>
         </Col>
       </Row>

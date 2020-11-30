@@ -10,6 +10,10 @@ import {
   DELETE_PRODUCT_RESET,
   DELETE_PRODUCT_SUCCESS,
   DELETE_PRODUCT_FAIL,
+  CREATE_PRODUCT_REQUEST,
+  CREATE_PRODUCT_RESET,
+  CREATE_PRODUCT_SUCCESS,
+  CREATE_PRODUCT_FAIL,
 } from '../types/productTypes';
 
 export const productListReducer = (
@@ -67,6 +71,34 @@ export const deleteProductReducer = (
       return { loading: false, error: action.payload, success: false };
     case DELETE_PRODUCT_RESET:
       return { loading: false, error: null, success: false };
+
+    default:
+      return state;
+  }
+};
+
+export const createProductReducer = (
+  state = {
+    loading: false,
+    error: null,
+    success: false,
+  },
+  action
+) => {
+  switch (action.type) {
+    case CREATE_PRODUCT_REQUEST:
+      return { loading: true, error: null, success: false };
+    case CREATE_PRODUCT_SUCCESS:
+      return {
+        loading: false,
+        error: null,
+        success: true,
+        product: action.payload,
+      };
+    case CREATE_PRODUCT_FAIL:
+      return { loading: false, error: action.payload, success: false };
+    case CREATE_PRODUCT_RESET:
+      return {};
 
     default:
       return state;

@@ -14,6 +14,7 @@ import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
 import UserListScreen from './screens/UserListScreen';
 import ProductListScreen from './screens/ProductListScreen';
+import ProductCreateScreen from './screens/ProductCreateScreen';
 import UserEditScreen from './screens/UserEditScreen';
 
 import { Container } from 'react-bootstrap';
@@ -48,6 +49,8 @@ function App() {
           <Route path="/admin/userlist" component={UserListScreen} />
 
           <Route path="/admin/productlist" component={ProductListScreen} />
+
+          <Route path="/admin/createproduct" component={ProductCreateScreen} />
 
           <Route exact path="/admin/user/:id/edit" component={UserEditScreen} />
         </Container>

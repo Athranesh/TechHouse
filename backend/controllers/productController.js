@@ -31,21 +31,34 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-  const product = new Product({
-    name: 'Sample name',
-    price: 0,
+  const {
+    name,
+    price,
+    image,
+    brand,
+    category,
+    countInStock,
+    description,
+  } = req.body;
+
+  const createdProduct = await Product.create({
+    name,
+    price,
     user: req.user._id,
     image: '/images/sample.jpg',
-    brand: 'sample brand',
-    category: 'sample category',
-    countInStock: 0,
+    brand,
+    category,
+    countInStock,
     numReviews: 0,
-    description: 'Sample description',
+    description,
   });
 
-  const createdProduct = await product.save();
-
-  res.status(201).json(createdProduct);
+  if (createdProduct) {
+    res.status(201).json(createdProduct);
+  } else {
+    res.status(400);
+    throw new Error('Invalid product data');
+  }
 });
 const updateProduct = asyncHandler(async (req, res) => {
   const {
