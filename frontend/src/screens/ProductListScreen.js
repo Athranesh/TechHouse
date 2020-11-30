@@ -9,6 +9,7 @@ import {
   PRODUCT_LIST_RESET,
   DELETE_PRODUCT_RESET,
   CREATE_PRODUCT_RESET,
+  UPDATE_PRODUCT_RESET,
 } from '../types/productTypes';
 
 const ProductListScreen = ({ history, location }) => {
@@ -30,6 +31,10 @@ const ProductListScreen = ({ history, location }) => {
     (state) => state.createProduct
   );
 
+  const { success: updateSuccess } = useSelector(
+    (state) => state.updateProduct
+  );
+
   useEffect(() => {
     if (deleteSuccess) {
       setMessage('Product deleted');
@@ -37,12 +42,15 @@ const ProductListScreen = ({ history, location }) => {
     } else if (createSuccess) {
       setMessage('Product created');
       dispatch({ type: CREATE_PRODUCT_RESET });
+    } else if (updateSuccess) {
+      setMessage('Product updated');
+      dispatch({ type: UPDATE_PRODUCT_RESET });
     }
     return () => {
       dispatch({ type: DELETE_PRODUCT_RESET });
       dispatch({ type: PRODUCT_LIST_RESET });
     };
-  }, [dispatch, deleteSuccess, createSuccess]);
+  }, [dispatch, deleteSuccess, createSuccess, updateSuccess]);
 
   //Handing initial load
   useEffect(() => {

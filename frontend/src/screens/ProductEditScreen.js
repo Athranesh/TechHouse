@@ -6,11 +6,13 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 
-import { createProduct } from '../actions/ProductActions';
+import { updateProduct, getProduct } from '../actions/ProductActions';
 
 import axios from 'axios';
 
-const ProductCreateScreen = ({ history, location }) => {
+const ProductEditScreen = ({ history, match }) => {
+  const productId = match.params.id;
+
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
@@ -27,9 +29,15 @@ const ProductCreateScreen = ({ history, location }) => {
 
   const userLogin = useSelector((state) => state.userLogin);
 
-  const { error, loading, success } = useSelector(
-    (state) => state.createProduct
+  const { error: detailsError, loading: detailsLoading, product } = useSelector(
+    (state) => state.productDetails
   );
+
+  const { error: updateError, loading: updateLoading, success } = useSelector(
+    (state) => state.updateProduct
+  );
+
+  //Security check
   useEffect(() => {
     if (
       !userLogin.userInfo ||
@@ -38,6 +46,23 @@ const ProductCreateScreen = ({ history, location }) => {
       history.push('/login');
     }
   }, [dispatch, userLogin, history]);
+
+  //Fetching data
+  useEffect(() => {
+    if (!product || (product && product._id !== productId)) {
+      dispatch(getProduct(productId));
+    } else {
+      setName(product.name);
+      setPrice(product.price);
+      setImage(product.image);
+      setBrand(product.brand);
+      setCategory(product.category);
+      setCount(product.countInStock);
+      setDescription(product.description);
+    }
+  }, [product, productId, history, dispatch]);
+
+  //Success and redirect check
 
   useEffect(() => {
     if (success) {
@@ -57,11 +82,7 @@ const ProductCreateScreen = ({ history, location }) => {
     setImage(file.name);
   };
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-
-    if (message) setMessage(null);
-
+  const submitHandlerWithImage = async () => {
     try {
       const config = {
         headers: {
@@ -87,16 +108,41 @@ const ProductCreateScreen = ({ history, location }) => {
         countInStock: count,
       };
 
-      dispatch(createProduct(productData));
-    } catch (error) {
+      dispatch(updateProduct(productId, productData));
+    } catch (detailsError) {
       setMessage('Please choose an image file');
 
       setUploading(false);
     }
   };
+  const submitHandlerWithoutImage = () => {
+    const productData = {
+      name,
+      price,
+      image,
+      brand,
+      category,
+      description,
+      countInStock: count,
+    };
+
+    dispatch(updateProduct(productId, productData));
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    if (message) setMessage(null);
+
+    if (formData) {
+      submitHandlerWithImage();
+    } else {
+      submitHandlerWithoutImage();
+    }
+  };
 
   const renderScreen = () => {
-    if (loading) {
+    if (detailsLoading || updateLoading) {
       return <Loader />;
     } else {
       return (
@@ -199,7 +245,7 @@ const ProductCreateScreen = ({ history, location }) => {
             </Form.Group>
 
             <Button type="submit" variant="primary">
-              Create product
+              Update product
             </Button>
           </Form>
         </>
@@ -215,8 +261,13 @@ const ProductCreateScreen = ({ history, location }) => {
         </Button>
       </LinkContainer>
       <FormContainer>
-        <h1>Register Product</h1>
-        {error && <Message variant="danger">{error}</Message>}
+        <h1>Update Product</h1>
+        {detailsError ||
+          (updateError && (
+            <Message variant="danger">
+              {detailsError ? detailsError : updateError}
+            </Message>
+          ))}
         {message && <Message variant="danger">{message}</Message>}
         {renderScreen()}
       </FormContainer>
@@ -224,4 +275,4 @@ const ProductCreateScreen = ({ history, location }) => {
   );
 };
 
-export default ProductCreateScreen;
+export default ProductEditScreen;

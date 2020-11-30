@@ -15,6 +15,7 @@ import OrderScreen from './screens/OrderScreen';
 import UserListScreen from './screens/UserListScreen';
 import ProductListScreen from './screens/ProductListScreen';
 import ProductCreateScreen from './screens/ProductCreateScreen';
+import ProductEditScreen from './screens/ProductEditScreen';
 import UserEditScreen from './screens/UserEditScreen';
 
 import { Container } from 'react-bootstrap';
@@ -49,6 +50,8 @@ function App() {
           <Route path="/admin/userlist" component={UserListScreen} />
 
           <Route path="/admin/productlist" component={ProductListScreen} />
+
+          <Route path="/admin/product/:id" component={ProductEditScreen} />
 
           <Route path="/admin/createproduct" component={ProductCreateScreen} />
 
