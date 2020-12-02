@@ -81,6 +81,8 @@ const AdminOrderScreen = ({ history, match }) => {
       return <Loader />;
     } else if (error) {
       return <Message variant="danger">{error}</Message>;
+    } else if (deliverError) {
+      return <Message variant="danger">{deliverError}</Message>;
     } else if (order) {
       return (
         <>

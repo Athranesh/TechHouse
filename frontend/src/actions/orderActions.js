@@ -16,6 +16,7 @@ import {
   ORDER_DELIVERED_REQUEST,
   ORDER_DELIVERED_SUCCESS,
 } from '../types/orderTypes';
+import { CART_RESET } from '../types/cartTypes';
 
 import { CLEAR_DETAILS } from '../types/userTypes';
 
@@ -40,7 +41,10 @@ export const createOrder = (orderData) => async (dispatch, getState) => {
       type: ORDER_CREATE_SUCCESS,
       payload: data,
     });
-    dispatch({});
+    localStorage.removeItem('cartItems');
+    dispatch({
+      type: CART_RESET,
+    });
   } catch (error) {
     dispatch({
       type: ORDER_CREATE_FAIL,
