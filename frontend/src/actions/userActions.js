@@ -194,7 +194,7 @@ export const getUserDetails = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get('api/users/profile', config);
+    const { data } = await axios.get('/api/users/profile', config);
 
     dispatch({
       type: USER_DETAILS_SUCCESS,

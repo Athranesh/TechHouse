@@ -9,6 +9,7 @@ import {
   CLEAR_LOGIN_ERROR,
   CLEAR_REGISTER_ERROR,
   USER_DETAILS_REQUEST,
+  USER_DETAILS_RESET,
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAIL,
   CLEAR_DETAILS_ERROR,
@@ -110,6 +111,14 @@ export const userDetailsReducer = (
       };
     case USER_DETAILS_REQUEST:
       return { ...state, loading: true };
+    case USER_DETAILS_RESET:
+      return {
+        loading: false,
+        userInfo: null,
+        error: null,
+        updated: false,
+        updateError: null,
+      };
 
     case USER_DETAILS_SUCCESS:
       return {

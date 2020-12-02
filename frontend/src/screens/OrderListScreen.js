@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Table, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 import { listOrders } from '../actions/orderActions';
 import { ORDER_LIST_RESET } from '../types/orderTypes';
 const OrderListScreen = ({ history }) => {
-  const [message, setMessage] = useState('');
+  // const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
 
@@ -37,7 +37,7 @@ const OrderListScreen = ({ history }) => {
   return (
     <>
       <h1>Orders</h1>
-      {message && <Message variant="success">{message}</Message>}
+      {/* {message && <Message variant="success">{message}</Message>} */}
       {loading ? (
         <Loader />
       ) : error ? (

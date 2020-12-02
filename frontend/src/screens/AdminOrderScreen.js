@@ -77,7 +77,7 @@ const AdminOrderScreen = ({ history, match }) => {
   };
 
   const renderScreen = () => {
-    if (loading) {
+    if (loading || deliverLoading) {
       return <Loader />;
     } else if (error) {
       return <Message variant="danger">{error}</Message>;

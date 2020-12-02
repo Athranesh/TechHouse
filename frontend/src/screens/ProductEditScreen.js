@@ -71,7 +71,7 @@ const ProductEditScreen = ({ history, match }) => {
       history.push('/admin/productlist');
       dispatch({ type: PRODUCT_RESET });
     }
-  }, [success, history]);
+  }, [success, history, dispatch]);
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];

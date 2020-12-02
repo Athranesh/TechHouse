@@ -14,25 +14,68 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../actions/ProductActions';
+import { getUserDetails } from '../actions/userActions';
+import { USER_DETAILS_RESET } from '../types/userTypes';
 
 function ProductScreen({ history, match }) {
+  const itemId = match.params.id;
+
   const [qty, setQty] = useState(1);
 
   const dispatch = useDispatch();
 
+  const userLogin = useSelector((state) => state.userLogin.userInfo);
+  const userDetailsInfo = useSelector((state) => state.userDetails.userInfo);
+  const productDetails = useSelector((state) => state.productDetails.product);
+
+  console.log(productDetails);
+
+  // const renderReviewBtn = () => {
+  if (userDetailsInfo) {
+    userDetailsInfo.orders.forEach((order) => {
+      console.log(order);
+      order.orderItems.forEach((item) => {
+        const purchasedItemId = item.product;
+
+        if (purchasedItemId === itemId) {
+          //If productDetails.reviews contains a review from this user, disable button
+          //If productDetails.reviews does not contain a review from this user and product is delivered, enable button
+          //If productDetails.reviews does not contain a review from this user but product is not delivered, ask them to wait
+        }
+      });
+    });
+  }
+  // };
+
   useEffect(() => {
-    dispatch(getProduct(match.params.id));
-  }, [dispatch, match.params.id]);
+    //Prevents double loading and extra rerender
+    if (userLogin) {
+      if (userLogin && !userDetailsInfo) {
+        dispatch(getUserDetails());
+        dispatch(getProduct(itemId));
+      }
+    } else {
+      dispatch(getProduct(itemId));
+    }
+  }, [dispatch, itemId, userLogin, userDetailsInfo]);
+
+  useEffect(() => {
+    return () => {
+      dispatch({ type: USER_DETAILS_RESET });
+    };
+  }, [dispatch]);
 
   const addToCartHandler = () => {
-    history.push(`/cart/${match.params.id}?qty=${qty}`);
+    history.push(`/cart/${itemId}?qty=${qty}`);
 
-    // history.push(`/cart/${match.params.id}/${qty}`);
+    // history.push(`/cart/${itemId}/${qty}`);
   };
 
   const { product, loading, error } = useSelector(
     (state) => state.productDetails
   );
+
+  const userInfo = useSelector((state) => state.userInfo);
 
   const renderScreen = () => {
     if (loading) {

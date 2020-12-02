@@ -5,7 +5,7 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 
 import { LinkContainer } from 'react-router-bootstrap';
-
+import { USER_DETAILS_RESET } from '../types/userTypes';
 import {
   getUserDetails,
   clearDetailsError,
@@ -40,6 +40,7 @@ const ProfileScreen = ({ history }) => {
     return () => {
       dispatch(clearDetailsError());
       dispatch(resetUpdate());
+      dispatch({ type: USER_DETAILS_RESET });
     };
   }, [dispatch, history, userLoginInfo]);
 
