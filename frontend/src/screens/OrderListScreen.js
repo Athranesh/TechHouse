@@ -13,8 +13,6 @@ const OrderListScreen = ({ history }) => {
 
   const { orders, loading, error } = useSelector((state) => state.orderList);
 
-  console.log(orders[0]);
-
   const userLogin = useSelector((state) => state.userLogin);
 
   //Handling cleanup of users data
@@ -35,12 +33,6 @@ const OrderListScreen = ({ history }) => {
       dispatch(listOrders());
     }
   }, [dispatch, userLogin, history]);
-
-  // const deleteHandler = (id) => {
-  //   if (window.confirm('Are you sure? This action is  irreversible!')) {
-  //     dispatch(deleteUser(id));
-  //   }
-  // };
 
   return (
     <>
@@ -86,12 +78,12 @@ const OrderListScreen = ({ history }) => {
                 </td>
 
                 <td>
-                  {/* <LinkContainer to={`/admin/order/${order._id}/edit`}> */}
-                  <Button variant="light" className="btn-sm">
-                    Details
-                    {/* <i className="fas fa-edit"></i> */}
-                  </Button>
-                  {/* </LinkContainer> */}
+                  <LinkContainer to={`/admin/order/${order._id}/edit`}>
+                    <Button variant="light" className="btn-sm">
+                      Details
+                      {/* <i className="fas fa-edit"></i> */}
+                    </Button>
+                  </LinkContainer>
 
                   {/* <Button
                     variant="danger"

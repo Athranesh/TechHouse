@@ -12,6 +12,9 @@ import {
   ORDER_LIST_FAIL,
   ORDER_LIST_REQUEST,
   ORDER_LIST_SUCCESS,
+  ORDER_DELIVERED_FAIL,
+  ORDER_DELIVERED_REQUEST,
+  ORDER_DELIVERED_SUCCESS,
 } from '../types/orderTypes';
 
 import { CLEAR_DETAILS } from '../types/userTypes';
@@ -143,6 +146,33 @@ export const listOrders = () => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: ORDER_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : 'Request failed',
+    });
+  }
+};
+
+export const deliverOrder = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: ORDER_DELIVERED_REQUEST });
+
+    const { token } = getState().userLogin.userInfo;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+    };
+
+    await axios.put(`/api/orders/admin/${id}/delivered`, {}, config);
+
+    dispatch({ type: ORDER_DELIVERED_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: ORDER_DELIVERED_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

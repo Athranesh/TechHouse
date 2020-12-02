@@ -49,7 +49,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
 
   //Checking if the correct user is receiving the order
   if (order) {
-    if (order.user._id.equals(req.user._id)) {
+    if (order.user._id.equals(req.user._id) || req.user.isAdmin) {
       res.json(order);
     } else {
       res.status(401);
@@ -94,5 +94,23 @@ export const getOrders = asyncHandler(async (req, res) => {
   } else {
     res.status(404);
     throw new Error('Not found');
+  }
+});
+
+export const updateOrderToDelivered = asyncHandler(async (req, res) => {
+  console.log(1);
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    await order.save();
+    // const updatedUser = await user.save();
+
+    res.status(200).json({ message: 'Order set to delivered' });
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
   }
 });

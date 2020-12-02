@@ -1,31 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { PayPalButton } from 'react-paypal-button-v2';
+
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrderById, payOrder } from '../actions/orderActions';
+import { getOrderById, deliverOrder } from '../actions/orderActions';
 import { Link } from 'react-router-dom';
-import { Row, Col, ListGroup, Image, Card } from 'react-bootstrap';
+import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
-import { CLEAR_ORDER_DETAILS } from '../types/orderTypes';
+import {
+  CLEAR_ORDER_DETAILS,
+  ORDER_DELIVERED_RESET,
+} from '../types/orderTypes';
 
-const OrderScreen = ({ history, match }) => {
-  const [sdkReady, setSdkReady] = useState(false);
+const AdminOrderScreen = ({ history, match }) => {
+  const orderId = match.params.id;
 
-  const addPayPalScript = async () => {
-    //Dynamically adding paypal script, for more info visit: https://developer.paypal.com/docs/checkout/reference/customize-sdk/
-
-    const { data: clientId } = await axios.get('/api/config/paypal');
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
-    script.async = true;
-    script.onload = () => {
-      setSdkReady(true);
-    };
-
-    document.body.appendChild(script);
-  };
+  const [message, setMessage] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -35,12 +24,13 @@ const OrderScreen = ({ history, match }) => {
 
   const orderData = useSelector((state) => state.getOrder);
 
+  const {
+    success: deliverSuccess,
+    error: deliverError,
+    loading: deliverLoading,
+  } = useSelector((state) => state.orderDelivered);
+
   const { loading, error, order } = orderData;
-
-  const orderPay = useSelector((state) => state.getOrder);
-
-  //Renaming a destructured value
-  const { loading: loadingPay } = orderPay;
 
   if (order) {
     order.itemsPrice = addDecimals(
@@ -52,6 +42,19 @@ const OrderScreen = ({ history, match }) => {
     order.taxPrice = addDecimals(Number((0.15 * order.itemsPrice).toFixed(2)));
   }
 
+  const userLogin = useSelector((state) => state.userLogin);
+
+  useEffect(() => {
+    if (
+      !userLogin.userInfo ||
+      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
+    ) {
+      history.push('/login');
+    } else {
+      dispatch(getOrderById(orderId));
+    }
+  }, [userLogin, history, orderId, dispatch]);
+
   //A separated useEffect for a state cleanup once user leaves this page
   useEffect(() => {
     return () => {
@@ -59,33 +62,18 @@ const OrderScreen = ({ history, match }) => {
     };
   }, [dispatch]);
 
-  const { userInfo } = useSelector((state) => state.userLogin);
   useEffect(() => {
-    //Access prohibited in case no user is logged in
-    if (!userInfo) {
-      history.push('/');
-    } else {
-      //Loading added below to prevent another request when loading is in progress. Error added because, in case it is not added, if there is an error, there will be an infinite rerender.
-      if (
-        (!order && !loading && !error) ||
-        (order && order._id !== match.params.id)
-      ) {
-        dispatch(getOrderById(match.params.id));
-      } else if (order && !order.isPaid) {
-        if (!window.paypal) {
-          addPayPalScript();
-        } else {
-          setSdkReady(true);
-        }
-      }
+    if (deliverSuccess) {
+      setMessage('Order updated');
     }
-  }, [error, history, userInfo, loading, order, dispatch, match.params.id]);
+    return () => {
+      dispatch({ type: ORDER_DELIVERED_RESET });
+    };
+  }, [dispatch, deliverSuccess]);
 
-  const successPaymentHandler = (paymentResult) => {
-    dispatch(payOrder(order._id, paymentResult));
-
-    dispatch({ type: CLEAR_ORDER_DETAILS });
-    dispatch(getOrderById(match.params.id));
+  const setDeliveredHandler = () => {
+    dispatch(deliverOrder(orderId));
+    dispatch(getOrderById(orderId));
   };
 
   const renderScreen = () => {
@@ -96,6 +84,7 @@ const OrderScreen = ({ history, match }) => {
     } else if (order) {
       return (
         <>
+          {message && <Message variant="success">{message}</Message>}
           <h1>Order {order._id}</h1>
           <Row>
             <Col md={8}>
@@ -121,11 +110,17 @@ const OrderScreen = ({ history, match }) => {
                   </p>
                   {order.isDelivered ? (
                     <Message variant="success">
-                      Delivered at {order.deliveredAt}
+                      Deilvered at {order.deliveredAt}
                     </Message>
                   ) : (
-                    <Message variant="danger">Not Delivered</Message>
+                    <Message variant="danger">Not Deilvered</Message>
                   )}
+                  <Button
+                    onClick={setDeliveredHandler}
+                    disabled={!order.isPaid || order.isDelivered}
+                  >
+                    Set as delivered
+                  </Button>
                 </ListGroup.Item>
 
                 <ListGroup.Item>
@@ -212,19 +207,7 @@ const OrderScreen = ({ history, match }) => {
                     >
                       Pay
                     </Button> */}
-                  {order && !order.isPaid && (
-                    <ListGroup.Item>
-                      {loadingPay && <Loader />}
-                      {!sdkReady ? (
-                        <Loader />
-                      ) : (
-                        <PayPalButton
-                          amount={order.totalPrice}
-                          onSuccess={successPaymentHandler}
-                        />
-                      )}
-                    </ListGroup.Item>
-                  )}
+                  {order && !order.isPaid && <ListGroup.Item></ListGroup.Item>}
                 </ListGroup>
               </Card>
             </Col>
@@ -237,4 +220,4 @@ const OrderScreen = ({ history, match }) => {
   return <>{renderScreen()}</>;
 };
 
-export default OrderScreen;
+export default AdminOrderScreen;

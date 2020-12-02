@@ -14,6 +14,10 @@ import {
   ORDER_LIST_RESET,
   ORDER_LIST_SUCCESS,
   CLEAR_ORDER_DETAILS,
+  ORDER_DELIVERED_FAIL,
+  ORDER_DELIVERED_REQUEST,
+  ORDER_DELIVERED_RESET,
+  ORDER_DELIVERED_SUCCESS,
 } from '../types/orderTypes';
 
 export const orderCreateReducer = (
@@ -132,6 +136,35 @@ export const orderListReducer = (
       };
     case ORDER_LIST_RESET:
       return { orders: [], loading: false, error: null };
+
+    default:
+      return state;
+  }
+};
+
+export const orderDeliveredReducer = (
+  state = { success: false, loading: false, error: null },
+  action
+) => {
+  switch (action.type) {
+    case ORDER_DELIVERED_REQUEST:
+      return {
+        loading: true,
+      };
+
+    case ORDER_DELIVERED_SUCCESS:
+      return {
+        loading: false,
+        success: true,
+      };
+
+    case ORDER_DELIVERED_FAIL:
+      return {
+        loading: false,
+        error: action.payload,
+      };
+    case ORDER_DELIVERED_RESET:
+      return { success: false, loading: false, error: null };
 
     default:
       return state;
