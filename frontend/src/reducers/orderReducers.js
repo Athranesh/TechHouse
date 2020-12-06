@@ -156,6 +156,7 @@ export const orderDeliveredReducer = (
       return {
         loading: false,
         success: true,
+        date: action.payload,
       };
 
     case ORDER_DELIVERED_FAIL:

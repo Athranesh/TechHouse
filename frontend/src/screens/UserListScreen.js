@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Table, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import { listUsers, deleteUser } from '../actions/userActions';
 import { USER_LIST_RESET, DELETE_USER_RESET } from '../types/userTypes';
 const UserListScreen = ({ history }) => {
   const [message, setMessage] = useState('');
+  const [redirect, setRedirect] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -27,11 +29,15 @@ const UserListScreen = ({ history }) => {
 
   //Handing initial load
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: { referrer: '/admin/userlist' },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
     } else {
       dispatch(listUsers());
     }
@@ -50,6 +56,8 @@ const UserListScreen = ({ history }) => {
       dispatch(deleteUser(id));
     }
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

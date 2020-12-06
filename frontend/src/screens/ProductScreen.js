@@ -24,40 +24,91 @@ function ProductScreen({ history, match }) {
 
   const dispatch = useDispatch();
 
-  const userLogin = useSelector((state) => state.userLogin.userInfo);
+  const userLoginInfo = useSelector((state) => state.userLogin.userInfo);
   const userDetailsInfo = useSelector((state) => state.userDetails.userInfo);
   const productDetails = useSelector((state) => state.productDetails.product);
 
-  console.log(productDetails);
+  const {
+    success: createReviewSuccess,
+    error: createReviewError,
+  } = useSelector((state) => state.createReview);
 
-  // const renderReviewBtn = () => {
-  if (userDetailsInfo) {
-    userDetailsInfo.orders.forEach((order) => {
-      console.log(order);
-      order.orderItems.forEach((item) => {
-        const purchasedItemId = item.product;
+  const renderReviewSection = () => {
+    if (!product) return;
 
-        if (purchasedItemId === itemId) {
-          //If productDetails.reviews contains a review from this user, disable button
-          //If productDetails.reviews does not contain a review from this user and product is delivered, enable button
-          //If productDetails.reviews does not contain a review from this user but product is not delivered, ask them to wait
-        }
-      });
+    return (
+      <Row className="my-3">
+        <Col md={6}>
+          <h2>Reviews</h2>
+          {!product.reviews.length && (
+            <Message>This product has not been reviewed yet</Message>
+          )}
+          <ListGroup variant="flush">
+            {product.reviews.map((review) => (
+              <ListGroup.Item key={review._id}>
+                <strong>{review.name}</strong>
+                <Rating value={review.rating} />
+                <p>{review.createdAt.substring(0, 10)}</p>
+                <p>{review.comment}</p>
+              </ListGroup.Item>
+            ))}
+
+            <ListGroup.Item>
+              {userLoginInfo ? (
+                renderReviewForm()
+              ) : (
+                <p>
+                  <Link to={`/login?redirect=product/${itemId}`}>Sign in</Link>{' '}
+                  to write a review
+                </p>
+              )}
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+      </Row>
+    );
+  };
+
+  const renderReviewForm = () => {
+    //User already reviewed
+    product.reviews.forEach((review) => {
+      if (review.user === userLoginInfo._id) {
+        return <p>You have already reviewed this product.</p>;
+      }
     });
-  }
-  // };
+    const { userHasPurchased, userHasReceived } = productDetails;
+
+    //User purchased but item is not delivered yet
+
+    if (userHasPurchased && !userHasReceived) {
+      return (
+        <Message variant="success">
+          You may post a review once you have received this product.
+        </Message>
+      );
+    } else if (userHasPurchased && !userHasReceived) {
+      return (
+        <Message variant="success">
+          You may post a review once you have received this product.
+        </Message>
+      );
+    } else if (!userHasPurchased && !userHasReceived) {
+      return <p>Purchase the product and post a review!</p>;
+    } else if (userHasPurchased && userHasReceived) {
+    }
+  };
 
   useEffect(() => {
     //Prevents double loading and extra rerender
-    if (userLogin) {
-      if (userLogin && !userDetailsInfo) {
+    if (userLoginInfo) {
+      if (userLoginInfo && !userDetailsInfo) {
         dispatch(getUserDetails());
         dispatch(getProduct(itemId));
       }
     } else {
       dispatch(getProduct(itemId));
     }
-  }, [dispatch, itemId, userLogin, userDetailsInfo]);
+  }, [dispatch, itemId, userLoginInfo, userDetailsInfo]);
 
   useEffect(() => {
     return () => {
@@ -177,6 +228,7 @@ function ProductScreen({ history, match }) {
         Go Back
       </Link>
       {renderScreen()}
+      {renderReviewSection()}
     </>
   );
 }

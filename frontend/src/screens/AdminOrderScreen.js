@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { getOrderById, deliverOrder } from '../actions/orderActions';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
@@ -14,7 +14,11 @@ import {
 const AdminOrderScreen = ({ history, match }) => {
   const orderId = match.params.id;
 
+  const [redirect, setRedirect] = useState(false);
   const [message, setMessage] = useState(null);
+  const [deliveredAt, setDeliveredAt] = useState(null);
+
+  const [deliveryBtnActive, setDeliveryBtnActive] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -28,9 +32,14 @@ const AdminOrderScreen = ({ history, match }) => {
     success: deliverSuccess,
     error: deliverError,
     loading: deliverLoading,
+    date: deliverDate,
   } = useSelector((state) => state.orderDelivered);
 
   const { loading, error, order } = orderData;
+
+  const orderDeliveredAt = order && order.deliveredAt;
+
+  const userId = order && order.user._id;
 
   if (order) {
     order.itemsPrice = addDecimals(
@@ -45,15 +54,24 @@ const AdminOrderScreen = ({ history, match }) => {
   const userLogin = useSelector((state) => state.userLogin);
 
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
-    } else {
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: { referrer: `/admin/order/${orderId}/edit` },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
+    } else if (!order && !loading) {
       dispatch(getOrderById(orderId));
     }
-  }, [userLogin, history, orderId, dispatch]);
+
+    if (orderDeliveredAt) {
+      setDeliveredAt(orderDeliveredAt);
+      setDeliveryBtnActive(false);
+    }
+  }, [userLogin, history, orderId, dispatch, orderDeliveredAt, loading, order]);
 
   //A separated useEffect for a state cleanup once user leaves this page
   useEffect(() => {
@@ -65,19 +83,26 @@ const AdminOrderScreen = ({ history, match }) => {
   useEffect(() => {
     if (deliverSuccess) {
       setMessage('Order updated');
+      setDeliveredAt(deliverDate.date);
     }
+
+    if (deliverLoading || deliverSuccess) {
+      setDeliveryBtnActive(false);
+    } else if (deliverError) {
+      setDeliveryBtnActive(true);
+    }
+
     return () => {
       dispatch({ type: ORDER_DELIVERED_RESET });
     };
-  }, [dispatch, deliverSuccess]);
+  }, [dispatch, deliverSuccess, deliverDate, deliverLoading, deliverError]);
 
   const setDeliveredHandler = () => {
-    dispatch(deliverOrder(orderId));
-    dispatch(getOrderById(orderId));
+    dispatch(deliverOrder(orderId, userId));
   };
 
   const renderScreen = () => {
-    if (loading || deliverLoading) {
+    if (loading) {
       return <Loader />;
     } else if (error) {
       return <Message variant="danger">{error}</Message>;
@@ -110,16 +135,18 @@ const AdminOrderScreen = ({ history, match }) => {
                     {order.shippingAddress && order.shippingAddress.city},
                     {order.shippingAddress && order.shippingAddress.postalCode}
                   </p>
-                  {order.isDelivered ? (
+                  {deliverLoading ? (
+                    <Loader width={40} height={40} />
+                  ) : deliveredAt ? (
                     <Message variant="success">
-                      Deilvered at {order.deliveredAt}
+                      Deilvered at {deliveredAt}
                     </Message>
                   ) : (
                     <Message variant="danger">Not Deilvered</Message>
                   )}
                   <Button
                     onClick={setDeliveredHandler}
-                    disabled={!order.isPaid || order.isDelivered}
+                    disabled={!deliveryBtnActive}
                   >
                     Set as delivered
                   </Button>
@@ -218,6 +245,8 @@ const AdminOrderScreen = ({ history, match }) => {
       );
     }
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return <>{renderScreen()}</>;
 };

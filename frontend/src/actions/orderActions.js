@@ -158,7 +158,7 @@ export const listOrders = () => async (dispatch, getState) => {
   }
 };
 
-export const deliverOrder = (id) => async (dispatch, getState) => {
+export const deliverOrder = (id, userId) => async (dispatch, getState) => {
   try {
     dispatch({ type: ORDER_DELIVERED_REQUEST });
 
@@ -171,9 +171,13 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
       },
     };
 
-    await axios.put(`/api/orders/admin/${id}/delivered`, {}, config);
+    const { data } = await axios.put(
+      `/api/orders/admin/${id}/delivered`,
+      { userId },
+      config
+    );
 
-    dispatch({ type: ORDER_DELIVERED_SUCCESS });
+    dispatch({ type: ORDER_DELIVERED_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
       type: ORDER_DELIVERED_FAIL,

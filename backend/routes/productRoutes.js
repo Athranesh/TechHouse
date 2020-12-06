@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.route('/').get(getProducts).post(protect, admin, createProduct);
 router.route('/admin').post(protect, admin, createProduct);
-router.route('/:id').get(getProductById);
-router.route('/:id/review').get(protect, createReview);
+router.route('/:id/:user').get(getProductById);
+router.route('/:id/review').post(protect, createReview);
 router
   .route('/admin/:id')
   .delete(protect, admin, deleteProductById)

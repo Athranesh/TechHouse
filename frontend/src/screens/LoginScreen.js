@@ -18,9 +18,9 @@ const LoginScreen = ({ history, location }) => {
 
   const { loading, error, userInfo } = userLogin;
 
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const redirect = location.state ? location.state.referrer : '/';
 
-  const step = location.search ? location.search.split('&')[0] : null;
+  const step = location.state ? location.state.step : null;
 
   useEffect(() => {
     if (userInfo) {
@@ -80,7 +80,16 @@ const LoginScreen = ({ history, location }) => {
             <Col>
               New Customer?{' '}
               <Link
-                to={redirect ? `/register?redirect=${redirect}` : '/register'}
+                to={
+                  redirect
+                    ? {
+                        pathname: '/register',
+                        state: {
+                          referrer: redirect,
+                        },
+                      }
+                    : '/register'
+                }
               >
                 Register
               </Link>
@@ -93,7 +102,7 @@ const LoginScreen = ({ history, location }) => {
 
   return (
     <FormContainer>
-      {step && <CheckoutSteps step1 />}
+      {step && redirect === 'shipping' && <CheckoutSteps step1 />}
       <h1>Sign In</h1>
       {error && <Message variant="danger">{error}</Message>}
       {renderScreen()}

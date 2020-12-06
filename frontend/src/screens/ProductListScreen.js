@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
 import { Table, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -14,6 +15,8 @@ import {
 
 const ProductListScreen = ({ history, location }) => {
   const [message, setMessage] = useState('');
+
+  const [redirect, setRedirect] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -54,11 +57,17 @@ const ProductListScreen = ({ history, location }) => {
 
   //Handing initial load
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: {
+          referrer: '/admin/productlist',
+        },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
     } else {
       dispatch(listProducts());
     }
@@ -67,6 +76,8 @@ const ProductListScreen = ({ history, location }) => {
   const deleteProductHandler = (id) => {
     dispatch(deleteProductById(id));
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

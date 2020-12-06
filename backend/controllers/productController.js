@@ -20,9 +20,20 @@ const deleteProductById = asyncHandler(async (req, res) => {
 });
 
 const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const currentUser = req.params.user;
+
+  const product = await (await Product.findById(req.params.id)).toObject();
 
   if (product) {
+    product.userHasPurchased = !!product.paidForBy.find(
+      (user) => user.toString() === currentUser
+    );
+    product.userHasReceived = !!product.deliveredTo.find(
+      (user) => user.toString() === currentUser
+    );
+    delete product.paidForBy;
+    delete product.deliveredTo;
+
     res.json(product);
   } else {
     res.status(404);

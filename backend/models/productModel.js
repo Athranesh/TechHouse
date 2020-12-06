@@ -22,6 +22,20 @@ const productSchema = mongoose.Schema({
     required: true,
     ref: 'User',
   },
+  deliveredTo: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: 'User',
+    },
+  ],
+  paidForBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: 'User',
+    },
+  ],
   name: {
     type: String,
     required: true,

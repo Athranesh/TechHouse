@@ -38,11 +38,19 @@ export const listProducts = () => async (dispatch) => {
   }
 };
 
-export const getProduct = (id) => async (dispatch) => {
+export const getProduct = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: PRODUCT_REQUEST });
 
-    const { data } = await axios.get(`/api/products/${id}`);
+    const userId = getState().userLogin.userInfo
+      ? getState().userLogin.userInfo._id
+      : null;
+
+    const { data } = await axios.get(
+      `/api/products/${id}/${userId}`,
+
+      { user: userId }
+    );
 
     dispatch({ type: PRODUCT_SUCCESS, payload: data });
   } catch (error) {

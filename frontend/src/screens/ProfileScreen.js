@@ -5,6 +5,7 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
 import { USER_DETAILS_RESET } from '../types/userTypes';
 import {
   getUserDetails,
@@ -21,6 +22,8 @@ const ProfileScreen = ({ history }) => {
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState(null);
 
+  const [redirect, setRedirect] = useState(null);
+
   const dispatch = useDispatch();
 
   const { error, loading, userInfo, updated } = useSelector(
@@ -35,7 +38,12 @@ const ProfileScreen = ({ history }) => {
 
   useEffect(() => {
     if (!userLoginInfo) {
-      history.push('/login');
+      setRedirect({
+        pathname: '/login',
+        state: {
+          referrer: '/profile',
+        },
+      });
     }
     return () => {
       dispatch(clearDetailsError());
@@ -204,6 +212,8 @@ const ProfileScreen = ({ history }) => {
       );
     }
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

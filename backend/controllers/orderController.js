@@ -1,5 +1,6 @@
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
+import Product from '../models/productModel.js';
 import asyncHandler from 'express-async-handler';
 
 export const saveOrder = asyncHandler(async (req, res) => {
@@ -65,6 +66,17 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    await Promise.all(
+      order.orderItems.map(async (item) => {
+        const product = await Product.findById(item.product);
+
+        if (product.paidForBy.indexOf(req.user._id) === -1) {
+          product.paidForBy.push(req.user._id);
+          await product.save();
+        }
+      })
+    );
+
     order.isPaid = true;
     order.paidAt = Date.now();
 
@@ -98,17 +110,29 @@ export const getOrders = asyncHandler(async (req, res) => {
 });
 
 export const updateOrderToDelivered = asyncHandler(async (req, res) => {
-  console.log(1);
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    const { userId } = req.body;
+
+    await Promise.all(
+      order.orderItems.map(async (item) => {
+        const product = await Product.findById(item.product);
+
+        if (product.deliveredTo.indexOf(userId) === -1) {
+          product.deliveredTo.push(userId);
+          await product.save();
+        }
+      })
+    );
+
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
     await order.save();
     // const updatedUser = await user.save();
 
-    res.status(200).json({ message: 'Order set to delivered' });
+    res.status(200).json({ date: order.deliveredAt });
   } else {
     res.status(404);
     throw new Error('Order not found');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -10,7 +11,7 @@ import { createProduct } from '../actions/ProductActions';
 
 import axios from 'axios';
 
-const ProductCreateScreen = ({ history, location }) => {
+const ProductCreateScreen = ({ history }) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
@@ -20,6 +21,7 @@ const ProductCreateScreen = ({ history, location }) => {
   const [count, setCount] = useState('');
   const [formData, setFormData] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [redirect, setRedirect] = useState(null);
 
   const [message, setMessage] = useState(null);
 
@@ -31,11 +33,17 @@ const ProductCreateScreen = ({ history, location }) => {
     (state) => state.createProduct
   );
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: {
+          referrer: '/admin/createproduct',
+        },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
     }
   }, [dispatch, userLogin, history]);
 
@@ -206,6 +214,8 @@ const ProductCreateScreen = ({ history, location }) => {
       );
     }
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

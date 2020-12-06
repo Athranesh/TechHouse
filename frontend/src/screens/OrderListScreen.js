@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -8,6 +9,8 @@ import { listOrders } from '../actions/orderActions';
 import { ORDER_LIST_RESET } from '../types/orderTypes';
 const OrderListScreen = ({ history }) => {
   // const [message, setMessage] = useState('');
+
+  const [redirect, setRedirect] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -24,15 +27,21 @@ const OrderListScreen = ({ history }) => {
 
   //Handing initial load
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: { referrer: '/admin/orderlist' },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
     } else {
       dispatch(listOrders());
     }
   }, [dispatch, userLogin, history]);
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

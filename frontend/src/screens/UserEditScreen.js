@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -18,6 +18,8 @@ import {
 const UserEditScreen = ({ history, match }) => {
   const userId = match.params.id;
 
+  const [redirect, setRedirect] = useState(null);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -34,13 +36,18 @@ const UserEditScreen = ({ history, match }) => {
   const { error, loading, userInfo: user, updated } = userDetails;
 
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: { referrer: `/admin/user/${userId}/edit` },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
+    } else {
+      dispatch(getUserById(userId));
     }
-
     if (updated) setMessage('User updated');
 
     return () => {
@@ -48,15 +55,15 @@ const UserEditScreen = ({ history, match }) => {
       dispatch(resetUpdate());
       dispatch(clearDetailsError());
     };
-  }, [userLogin, history, dispatch, updated]);
+  }, [userLogin, history, dispatch, updated, userId]);
 
   useEffect(() => {
-    if (!user || !user.name || user._id !== userId) {
-      dispatch(getUserById(userId));
-    } else {
+    if (user && user._id === userId) {
       setName(user.name);
       setEmail(user.email);
       setIsAdmin(user.isAdmin);
+    } else if (user && user._id !== userId) {
+      dispatch(getUserById(userId));
     }
   }, [user, userId, dispatch]);
 
@@ -115,9 +122,13 @@ const UserEditScreen = ({ history, match }) => {
     }
   };
 
+  if (redirect) return <Redirect to={redirect} />;
+
   return (
     <>
-      <Link to="/admin/userList" className="btn btn-light my-3"></Link>
+      <Link to="/admin/userList" className="btn btn-light my-3">
+        go back
+      </Link>
       <FormContainer>
         {message && <Message variant="success">{message}</Message>}
         <h1>Edit User</h1>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -15,6 +16,7 @@ import axios from 'axios';
 const ProductEditScreen = ({ history, match }) => {
   const productId = match.params.id;
 
+  const [redirect, setRedirect] = useState(null);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
@@ -41,13 +43,19 @@ const ProductEditScreen = ({ history, match }) => {
 
   //Security check
   useEffect(() => {
-    if (
-      !userLogin.userInfo ||
-      (userLogin.userInfo && !userLogin.userInfo.isAdmin)
-    ) {
-      history.push('/login');
+    if (!userLogin.userInfo) {
+      setRedirect({
+        pathname: '/login',
+        state: {
+          referrer: `/admin/product/${productId}/edit`,
+        },
+      });
+    } else if (userLogin.userInfo && !userLogin.userInfo.isAdmin) {
+      setRedirect({
+        pathname: '/',
+      });
     }
-  }, [dispatch, userLogin, history]);
+  }, [dispatch, userLogin, history, productId]);
 
   //Fetching data
   useEffect(() => {
@@ -255,6 +263,8 @@ const ProductEditScreen = ({ history, match }) => {
       );
     }
   };
+
+  if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>

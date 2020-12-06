@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
+import { Redirect } from 'react-router-dom';
 import {
   Row,
   Col,
@@ -14,15 +15,11 @@ import {
 import { addToCart, removeFromCart } from '../actions/cartActions';
 
 const CartScreen = ({ match, location, history }) => {
-  //location is used to access query strings in the url
+  const [redirect, setRedirect] = useState('');
 
-  //Will be available only if the user gets redirected to cart screen by selecting a product
   const productId = match.params.id;
 
-  //example: if qty=2, location.search will return ?qty=2, to access the number, we split by equal sign, returning ['qty','2'], item at index 1 will be the number that we are looking for in string format.
   const qty = location.search ? Number(location.search.split('=')[1]) : 1;
-
-  // const qty = match.params.qty ? Number(match.params.qty) : 1;
 
   const dispatch = useDispatch();
 
@@ -40,8 +37,21 @@ const CartScreen = ({ match, location, history }) => {
     dispatch(removeFromCart(id));
   };
   const checkOuthandler = (id) => {
-    history.push('/login?step&redirect=shipping');
+    setRedirect(true);
   };
+
+  if (redirect)
+    return (
+      <Redirect
+        to={{
+          pathname: '/login',
+          state: {
+            referrer: 'shipping',
+            step: true,
+          },
+        }}
+      />
+    );
 
   return (
     <Row>
