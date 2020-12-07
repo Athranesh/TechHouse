@@ -10,7 +10,7 @@ const SearchBox = ({ history }) => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 975) {
-        setSize(50);
+        setSize(40);
       } else {
         setSize(null);
       }

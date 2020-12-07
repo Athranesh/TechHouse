@@ -15,7 +15,7 @@ const Header = () => {
 
   return (
     <header>
-      <Navbar className="navbar-dark bg-primary" expand="md">
+      <Navbar className="navbar-dark bg-primary" expand="lg">
         <Container>
           <LinkContainer className="align-self-start" to="/">
             <Navbar.Brand className="">Tech House</Navbar.Brand>
@@ -56,10 +56,10 @@ const Header = () => {
                 </NavDropdown>
               )}
               <LinkContainer to="/cart">
-                <Nav.Link className="mr-4 mr-sm-0">
+                <Nav.Link className="mr-2 mr-sm-0">
                   <i className="fas fa-shopping-cart"></i> Cart
                 </Nav.Link>
-              </LinkContainer>{' '}
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Container>
