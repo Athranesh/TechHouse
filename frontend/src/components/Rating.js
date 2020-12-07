@@ -23,7 +23,6 @@ function Rating({ value, text, color }) {
     <div className="rating">
       {uiStarClasses.map((uiStarClass, index) => {
         return (
-          //index can be safely used as key here, as any change to rating causes a full rerender of this component.
           <span key={index}>
             <i style={{ color }} className={uiStarClass}></i>
           </span>
@@ -40,7 +39,7 @@ Rating.defaultProps = {
 
 Rating.propTypes = {
   value: PropTypes.number.isRequired,
-  text: PropTypes.string.isRequired,
+  text: PropTypes.string,
   color: PropTypes.string,
 };
 

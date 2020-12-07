@@ -52,7 +52,7 @@ export const productDetailsReducer = (
 ) => {
   switch (action.type) {
     case PRODUCT_REQUEST:
-      return { loading: true, product: null };
+      return { ...state, loading: true };
     case PRODUCT_SUCCESS:
       return { loading: false, product: action.payload };
     case PRODUCT_FAIL:

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import useLogout from '../hooks/useLogout';
+import SearchBox from './SearchBox';
 
 const Header = () => {
   const userLogin = useSelector((state) => state.userLogin);
@@ -13,53 +14,51 @@ const Header = () => {
 
   return (
     <header>
-      <Navbar className="navbar-dark bg-primary" expand="sm">
-        <Container className="align-items-center flex-column flex-sm-row justify-content-sm-between">
+      <Navbar className="navbar-dark bg-primary" expand="md">
+        <Container>
           <LinkContainer className="align-self-start" to="/">
             <Navbar.Brand className="">Tech House</Navbar.Brand>
           </LinkContainer>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-          <Nav
-            className="flex-row  
-          align-self-start
-          justify-content-between
-          justify-content-sm-end mt-2 mt-sm-0"
-          >
-            <LinkContainer to="/cart">
-              <Nav.Link className="mr-4 mr-sm-0">
-                <i className="fas fa-shopping-cart"></i> Cart
-              </Nav.Link>
-            </LinkContainer>
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ml-auto">
+              <SearchBox />
+              {userInfo ? (
+                <NavDropdown title={userInfo.name} id="username">
+                  <LinkContainer to="/profile">
+                    <NavDropdown.Item>Profile</NavDropdown.Item>
+                  </LinkContainer>
 
-            {userInfo ? (
-              <NavDropdown title={userInfo.name} id="username">
-                <LinkContainer to="/profile">
-                  <NavDropdown.Item>Profile</NavDropdown.Item>
+                  <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <LinkContainer to="/login">
+                  <Nav.Link className="mr-4 mr-sm-0">
+                    <i className="fas fa-user"></i> Sign In
+                  </Nav.Link>
                 </LinkContainer>
-
-                <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-              </NavDropdown>
-            ) : (
-              <LinkContainer to="/login">
+              )}
+              {userInfo && userInfo.isAdmin && (
+                <NavDropdown title="Admin" id="adminmenu">
+                  <LinkContainer to="/admin/userlist">
+                    <NavDropdown.Item>Users</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to="/admin/productlist">
+                    <NavDropdown.Item>Products</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to="/admin/orderlist">
+                    <NavDropdown.Item>Orders</NavDropdown.Item>
+                  </LinkContainer>
+                </NavDropdown>
+              )}
+              <LinkContainer to="/cart">
                 <Nav.Link className="mr-4 mr-sm-0">
-                  <i className="fas fa-user"></i> Sign In
+                  <i className="fas fa-shopping-cart"></i> Cart
                 </Nav.Link>
-              </LinkContainer>
-            )}
-            {userInfo && userInfo.isAdmin && (
-              <NavDropdown title="Admin" id="adminmenu">
-                <LinkContainer to="/admin/userlist">
-                  <NavDropdown.Item>Users</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/admin/productlist">
-                  <NavDropdown.Item>Products</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/admin/orderlist">
-                  <NavDropdown.Item>Orders</NavDropdown.Item>
-                </LinkContainer>
-              </NavDropdown>
-            )}
-          </Nav>
+              </LinkContainer>{' '}
+            </Nav>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
     </header>

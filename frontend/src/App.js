@@ -32,6 +32,8 @@ function App() {
         <Container>
           <Route path="/" component={HomeScreen} exact />
 
+          <Route path="/search/:keyword" component={HomeScreen} />
+
           <Route path="/product/:id" component={ProductScreen} />
 
           {/* ? for optional */}

@@ -13,19 +13,19 @@ import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProduct } from '../actions/ProductActions';
-import { getUserDetails } from '../actions/userActions';
-import { USER_DETAILS_RESET } from '../types/userTypes';
+import { getProduct, createReview } from '../actions/ProductActions';
+import { CREATE_REVIEW_RESET } from '../types/productTypes';
 
 function ProductScreen({ history, match }) {
   const itemId = match.params.id;
 
   const [qty, setQty] = useState(1);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
 
   const dispatch = useDispatch();
 
   const userLoginInfo = useSelector((state) => state.userLogin.userInfo);
-  const userDetailsInfo = useSelector((state) => state.userDetails.userInfo);
   const productDetails = useSelector((state) => state.productDetails.product);
 
   const {
@@ -33,52 +33,75 @@ function ProductScreen({ history, match }) {
     error: createReviewError,
   } = useSelector((state) => state.createReview);
 
+  useEffect(() => {
+    if (createReviewSuccess) {
+      setComment('');
+      setRating(0);
+      dispatch({ type: CREATE_REVIEW_RESET });
+    }
+
+    dispatch(getProduct(itemId));
+  }, [dispatch, itemId, createReviewSuccess]);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    dispatch(
+      createReview(match.params.id, {
+        rating,
+        comment,
+      })
+    );
+  };
+
   const renderReviewSection = () => {
-    if (!product) return;
-
     return (
-      <Row className="my-3">
-        <Col md={6}>
-          <h2>Reviews</h2>
-          {!product.reviews.length && (
-            <Message>This product has not been reviewed yet</Message>
-          )}
-          <ListGroup variant="flush">
-            {product.reviews.map((review) => (
-              <ListGroup.Item key={review._id}>
-                <strong>{review.name}</strong>
-                <Rating value={review.rating} />
-                <p>{review.createdAt.substring(0, 10)}</p>
-                <p>{review.comment}</p>
-              </ListGroup.Item>
-            ))}
+      product && (
+        <Row className="my-3">
+          <Col md={6}>
+            <h2>Reviews</h2>
+            {!product.reviews.length && (
+              <Message>This product has not been reviewed yet</Message>
+            )}
+            <ListGroup variant="flush">
+              {product.reviews.map((review) => (
+                <ListGroup.Item key={review._id}>
+                  <strong>{review.name}</strong>
+                  <Rating value={review.rating} />
+                  <p>{review.createdAt.substring(0, 10)}</p>
+                  <p>{review.comment}</p>
+                </ListGroup.Item>
+              ))}
 
-            <ListGroup.Item>
-              {userLoginInfo ? (
-                renderReviewForm()
-              ) : (
-                <p>
-                  <Link to={`/login?redirect=product/${itemId}`}>Sign in</Link>{' '}
-                  to write a review
-                </p>
-              )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-      </Row>
+              <ListGroup.Item>
+                {createReviewError && (
+                  <Message variant="danger">{createReviewError}</Message>
+                )}
+                {userLoginInfo ? (
+                  renderReviewForm()
+                ) : (
+                  <p>
+                    <Link to={`/login?redirect=product/${itemId}`}>
+                      Sign in
+                    </Link>{' '}
+                    to write a review
+                  </p>
+                )}
+              </ListGroup.Item>
+            </ListGroup>
+          </Col>
+        </Row>
+      )
     );
   };
 
   const renderReviewForm = () => {
-    //User already reviewed
-    product.reviews.forEach((review) => {
-      if (review.user === userLoginInfo._id) {
-        return <p>You have already reviewed this product.</p>;
-      }
-    });
-    const { userHasPurchased, userHasReceived } = productDetails;
+    const alreadyReviewed = !!product.reviews.find(
+      (review) => review.user === userLoginInfo._id
+    );
 
-    //User purchased but item is not delivered yet
+    if (alreadyReviewed) return <p>You have already reviewed this product.</p>;
+
+    const { userHasPurchased, userHasReceived } = productDetails;
 
     if (userHasPurchased && !userHasReceived) {
       return (
@@ -95,50 +118,56 @@ function ProductScreen({ history, match }) {
     } else if (!userHasPurchased && !userHasReceived) {
       return <p>Purchase the product and post a review!</p>;
     } else if (userHasPurchased && userHasReceived) {
+      return (
+        <Form onSubmit={submitHandler}>
+          <Form.Group controlId="rating">
+            <Form.Label>Rating</Form.Label>
+            <Form.Control
+              as="select"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              required
+            >
+              <option value="">Select ...</option>
+              <option value="1">1 - Poor</option>
+              <option value="2">2 - Fair</option>
+              <option value="3">3 - Good</option>
+              <option value="4">4 - Very Good</option>
+              <option value="5">5 - Excelent</option>
+            </Form.Control>
+          </Form.Group>
+          <Form.Group controlId="comment">
+            <Form.Label>Comment</Form.Label>
+            <Form.Control
+              required
+              as="textarea"
+              row="3"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            ></Form.Control>
+          </Form.Group>
+          <Button type="submit" variant="primary">
+            Submit
+          </Button>
+        </Form>
+      );
     }
   };
-
-  useEffect(() => {
-    //Prevents double loading and extra rerender
-    if (userLoginInfo) {
-      if (userLoginInfo && !userDetailsInfo) {
-        dispatch(getUserDetails());
-        dispatch(getProduct(itemId));
-      }
-    } else {
-      dispatch(getProduct(itemId));
-    }
-  }, [dispatch, itemId, userLoginInfo, userDetailsInfo]);
-
-  useEffect(() => {
-    return () => {
-      dispatch({ type: USER_DETAILS_RESET });
-    };
-  }, [dispatch]);
 
   const addToCartHandler = () => {
     history.push(`/cart/${itemId}?qty=${qty}`);
-
-    // history.push(`/cart/${itemId}/${qty}`);
   };
 
-  const { product, loading, error } = useSelector(
-    (state) => state.productDetails
-  );
-
-  const userInfo = useSelector((state) => state.userInfo);
+  const { product, error } = useSelector((state) => state.productDetails);
 
   const renderScreen = () => {
-    if (loading) {
-      return <Loader />;
-    } else if (error) {
+    if (error) {
       return <Message variant="danger">{error}</Message>;
     } else if (product) {
       return (
         <Row>
           <Col lg={6}>
             <Image src={product.image} alt={product.name} fluid />
-            {/*fluid stops items from going out of their containers*/}
           </Col>
           <Col lg={3}>
             <ListGroup variant="flush">
@@ -190,9 +219,6 @@ function ProductScreen({ history, match }) {
                             setQty(e.target.value);
                           }}
                         >
-                          {/*
-                          Array(number) creates an [empty * number], spreading it creates an array of undefined items, as many as the number is. Example:[...Array(5)] gives an array of 5 undefineds. Using .key() returns their indeces, so we end up with an array of [0,1,2,3,4]
-                           */}
                           {[...Array(product.countInStock).keys()].map((x) => (
                             <option key={x + 1} value={x + 1}>
                               {x + 1}
