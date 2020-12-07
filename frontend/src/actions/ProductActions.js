@@ -2,6 +2,9 @@ import {
   PRODUCT_LIST_REQUEST,
   PRODUCT_LIST_SUCCESS,
   PRODUCT_LIST_FAIL,
+  TOP_PRODUCT_LIST_REQUEST,
+  TOP_PRODUCT_LIST_SUCCESS,
+  TOP_PRODUCT_LIST_FAIL,
   PRODUCT_REQUEST,
   PRODUCT_SUCCESS,
   PRODUCT_FAIL,
@@ -34,6 +37,27 @@ export const listProducts = (keyword = '', pageNumber = '') => async (
   } catch (error) {
     dispatch({
       type: PRODUCT_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+export const listTopProducts = (keyword = '', pageNumber = '') => async (
+  dispatch
+) => {
+  try {
+    dispatch({ type: TOP_PRODUCT_LIST_REQUEST });
+
+    const { data } = await axios.get(
+      `/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+    );
+
+    dispatch({ type: TOP_PRODUCT_LIST_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: TOP_PRODUCT_LIST_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

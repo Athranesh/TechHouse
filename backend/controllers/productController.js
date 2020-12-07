@@ -17,11 +17,13 @@ const getProducts = asyncHandler(async (req, res) => {
 
   const count = await Product.countDocuments({ ...keyword });
 
+  const topProducts = await Product.find({}).sort({ rating: -1 }).limit(3);
+
   const products = await Product.find(keyword)
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
-  res.json({ products, page, pages: Math.ceil(count / pageSize) });
+  res.json({ topProducts, products, page, pages: Math.ceil(count / pageSize) });
 });
 
 const deleteProductById = asyncHandler(async (req, res) => {

@@ -10,7 +10,6 @@ import {
   Button,
 } from 'react-bootstrap';
 import Rating from '../components/Rating';
-import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct, createReview } from '../actions/ProductActions';
