@@ -54,8 +54,6 @@ const getProductById = asyncHandler(async (req, res) => {
 
   const product = await (await Product.findById(req.params.id)).toObject();
 
-  console.log(product.reviews);
-
   if (product) {
     product.userHasPurchased = !!product.paidForBy.find(
       (user) => user.toString() === currentUser

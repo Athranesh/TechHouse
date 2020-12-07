@@ -14,8 +14,10 @@ const ProductCarousel = () => {
   );
 
   useEffect(() => {
-    dispatch(listTopProducts());
-  }, [dispatch]);
+    if (!topProducts && !loading) {
+      dispatch(listTopProducts());
+    }
+  }, [dispatch, topProducts, loading]);
 
   if (!topProducts) return <></>;
 
