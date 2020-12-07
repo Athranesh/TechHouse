@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { Form, Button } from 'react-bootstrap';
 
 const SearchBox = ({ history }) => {
@@ -23,7 +24,11 @@ const SearchBox = ({ history }) => {
   const submitHandler = (e) => {
     e.preventDefault();
 
-    if (keyword.trim()) history.push(`/search/${keyword}`);
+    if (keyword.trim()) {
+      history.push(`/search/${keyword}`);
+    } else {
+      history.push('/');
+    }
   };
 
   return (
