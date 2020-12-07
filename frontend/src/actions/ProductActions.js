@@ -44,15 +44,11 @@ export const listProducts = (keyword = '', pageNumber = '') => async (
     });
   }
 };
-export const listTopProducts = (keyword = '', pageNumber = '') => async (
-  dispatch
-) => {
+export const listTopProducts = () => async (dispatch) => {
   try {
     dispatch({ type: TOP_PRODUCT_LIST_REQUEST });
 
-    const { data } = await axios.get(
-      `/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
-    );
+    const { data } = await axios.get('/api/products/top');
 
     dispatch({ type: TOP_PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {

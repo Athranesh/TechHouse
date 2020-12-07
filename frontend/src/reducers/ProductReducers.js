@@ -65,7 +65,7 @@ export const topProductListReducer = (
     case TOP_PRODUCT_LIST_SUCCESS:
       return {
         loading: false,
-        topProducts: action.payload.topProducts,
+        topProducts: action.payload,
       };
 
     case TOP_PRODUCT_LIST_FAIL:

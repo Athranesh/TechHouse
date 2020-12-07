@@ -17,13 +17,24 @@ const getProducts = asyncHandler(async (req, res) => {
 
   const count = await Product.countDocuments({ ...keyword });
 
-  const topProducts = await Product.find({}).sort({ rating: -1 }).limit(3);
-
   const products = await Product.find(keyword)
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
-  res.json({ topProducts, products, page, pages: Math.ceil(count / pageSize) });
+  res.json({ products, page, pages: Math.ceil(count / pageSize) });
+});
+const getTopProducts = asyncHandler(async (req, res) => {
+  const topProducts = await Product.find({})
+    .select('-deliveredTo -paidForBy')
+    .sort({ rating: -1 })
+    .limit(3);
+
+  if (topProducts) {
+    res.json(topProducts);
+  } else {
+    res.status(404);
+    throw new Error('Products not found');
+  }
 });
 
 const deleteProductById = asyncHandler(async (req, res) => {
@@ -162,6 +173,7 @@ const createReview = asyncHandler(async (req, res) => {
 });
 
 export {
+  getTopProducts,
   createReview,
   updateProduct,
   createProduct,
