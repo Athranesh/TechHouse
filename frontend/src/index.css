@@ -62,8 +62,18 @@ h2 {
   top: 0;
 }
 .carousel-caption p {
-  font-size: 0.8rem;
+  position: absolute;
+  top: 0;
+  margin-top: 8px;
+
+  font-size: 0.9rem;
   color: #333;
+}
+
+@media (max-width: 740px) {
+  .carousel-caption p {
+    font-size: 0.7rem;
+  }
 }
 /* .carousel img {
   height: 300px;
