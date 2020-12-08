@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { Route } from 'react-router-dom';
+// import { Route } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import useLogout from '../hooks/useLogout';
 import SearchBox from './SearchBox';
@@ -24,9 +24,11 @@ const Header = () => {
 
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">
-              <Route
+              <SearchBox />
+              {/* <Route
                 render={({ history }) => <SearchBox history={history} />}
-              />
+              /> */}
+
               {userInfo ? (
                 <NavDropdown title={userInfo.name} id="username">
                   <LinkContainer to="/profile">

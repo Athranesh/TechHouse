@@ -1,25 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+
+import { useHistory } from 'react-router-dom';
 
 import { Form, Button } from 'react-bootstrap';
 
-const SearchBox = ({ history }) => {
+import useResize from '../hooks/useResize';
+
+const SearchBox = () => {
   const [keyword, setKeyword] = useState('');
 
-  const [size, setSize] = useState(null);
+  const { width } = useResize();
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 975) {
-        setSize(40);
-      } else {
-        setSize(null);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  });
+  const history = useHistory();
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -32,15 +24,22 @@ const SearchBox = ({ history }) => {
   };
 
   return (
-    <Form onSubmit={submitHandler} inline>
+    <Form
+      onSubmit={submitHandler}
+      inline
+      style={{
+        marginTop: width < 992 ? '20px' : 0,
+        marginBottom: width < 992 ? '20px' : 0,
+      }}
+    >
       <Form.Control
         type="text"
         style={{ width: '70%' }}
-        htmlSize={size && size}
+        htmlSize={width > 975 ? 40 : null}
         name="q"
         onChange={(e) => setKeyword(e.target.value)}
         placeholder="Search Products..."
-        className="mr-sm-1 mr-md-0 my-sm-4 my-md-0"
+        className="mr-sm-1 mr-md-0"
       ></Form.Control>
       <Button
         type="submit"
