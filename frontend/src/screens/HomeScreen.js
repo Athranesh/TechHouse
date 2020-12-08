@@ -55,9 +55,13 @@ function HomeScreen({ match }) {
 
   return (
     <>
-      {!keyword && <ProductCarousel />}
+      {!keyword && (
+        <>
+          <ProductCarousel />
+        </>
+      )}
 
-      <h1>Latest Products</h1>
+      <h1 style={{ marginTop: '40px' }}>Latest Products</h1>
       {renderScreen()}
     </>
   );
