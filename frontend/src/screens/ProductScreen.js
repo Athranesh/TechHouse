@@ -13,7 +13,7 @@ import Rating from '../components/Rating';
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct, createReview } from '../actions/ProductActions';
-import { CREATE_REVIEW_RESET } from '../types/productTypes';
+import { CREATE_REVIEW_RESET, PRODUCT_RESET } from '../types/productTypes';
 
 function ProductScreen({ history, match }) {
   const itemId = match.params.id;
@@ -40,6 +40,8 @@ function ProductScreen({ history, match }) {
     }
 
     dispatch(getProduct(itemId));
+
+    return () => dispatch({ type: PRODUCT_RESET });
   }, [dispatch, itemId, createReviewSuccess]);
 
   const submitHandler = (e) => {
