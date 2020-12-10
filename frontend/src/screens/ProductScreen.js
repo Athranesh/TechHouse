@@ -81,7 +81,14 @@ function ProductScreen({ history, match }) {
                   renderReviewForm()
                 ) : (
                   <p>
-                    <Link to={`/login?redirect=product/${itemId}`}>
+                    <Link
+                      to={{
+                        pathname: '/login',
+                        state: {
+                          referrer: `product/${itemId}`,
+                        },
+                      }}
+                    >
                       Sign in
                     </Link>{' '}
                     to write a review
