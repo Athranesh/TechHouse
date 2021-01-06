@@ -5,8 +5,6 @@ An ecommerce app that helps me keep in touch with the React world in a fun way, 
 
 Live version: https://techhouse-ecommerce.herokuapp.com/
 
-(Kindly blame the long initial loading time on Heroku.)
-
 The app was made following a Fullstack course made by Brad Traversy (Traversymedia).
 
 So far I have made several modifications to the original course app, such as modifying Redux actions and reducers, adding frontend route protections in addition to the backend ones as well as 
